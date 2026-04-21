@@ -27,9 +27,3 @@ This module provides a robust framework for registering, categorizing, and monit
     *   `views/`: XML definitions for the UI.
     *   `security/`: Access rights and record rules.
     *   `controllers/`: (Optional) Web and API endpoints.
-
-## 📄 License
-According to the company policy.
-
----
-*Created by Antigravity - Senior Architect & Mentor*
