@@ -1,60 +1,59 @@
 <odoo>
   <data>
-    <!-- explicit list view definition -->
-<!--
-    <record model="ir.ui.view" id="gestion_activos_intangibles.list">
-      <field name="name">gestion_activos_intangibles list</field>
-      <field name="model">gestion_activos_intangibles.gestion_activos_intangibles</field>
-      <field name="arch" type="xml">
-        <list>
-          <field name="name"/>
-          <field name="value"/>
-          <field name="value2"/>
-        </list>
-      </field>
-    </record>
--->
+  `interfaz que muestra el formulaio de llenado para los datos de los activos intangibles`
+  <record id="view_activo_intangible_form" model="ir.ui.view">
+    <field name="name">activo.intangible.form</field> 
+    <field name="model">activo.intangible</field>
+    <field name="arch" type="xml">
+      <form>
+        <sheet>
+          <group>
+            <field name="name"/>
+            <field name="asset_type"/>
+            <field name="registration_number"/>
+            <field name="concession_date"/>
+            <field name="renewal_date"/>
+            <field name="responsible_id"/>
+            <field name="expense_id"/>
+          </group>
+        </sheet>
+      </form>
+    </field>
+  </record>
 
-    <!-- actions opening views on models -->
-<!--
-    <record model="ir.actions.act_window" id="gestion_activos_intangibles.action_window">
-      <field name="name">gestion_activos_intangibles window</field>
-      <field name="res_model">gestion_activos_intangibles.gestion_activos_intangibles</field>
-      <field name="view_mode">list,form</field>
-    </record>
--->
+ `lista de activos intangibles`
+  <record id="view_activo_intangible_list" model="ir.ui.view">
+    <field name="name">activo.intangible.list</field>
+    <field name="model">activo.intangible</field>
+    <field name="arch" type="xml">
+      <list>
+        <field name="name"/>
+        <field name="asset_type"/>
+        <field name="registration_number"/>
+        <field name="concession_date"/>
+        <field name="renewal_date"/>
+        <field name="responsible_id"/>
+        <field name="expense_id"/>
+        <field name="state"/>
+      </list>
+    </field>
+  </record>
 
-    <!-- server action to the one above -->
-<!--
-    <record model="ir.actions.server" id="gestion_activos_intangibles.action_server">
-      <field name="name">gestion_activos_intangibles server</field>
-      <field name="model_id" ref="model_gestion_activos_intangibles_gestion_activos_intangibles"/>
-      <field name="state">code</field>
-      <field name="code">
-        action = {
-          "type": "ir.actions.act_window",
-          "view_mode": "list,form",
-          "res_model": model._name,
-        }
-      </field>
-    </record>
--->
+  <record id="action_activo_intangible" model="ir.actions.act_window">
+    <field name="name">activo.intangible.action</field>
+    <field name="res_model">activo.intangible</field>
+    <field name="view_mode">list,form</field>
+  </record>
 
-    <!-- Top menu item -->
-<!--
-    <menuitem name="gestion_activos_intangibles" id="gestion_activos_intangibles.menu_root"/>
--->
-    <!-- menu categories -->
-<!--
-    <menuitem name="Menu 1" id="gestion_activos_intangibles.menu_1" parent="gestion_activos_intangibles.menu_root"/>
-    <menuitem name="Menu 2" id="gestion_activos_intangibles.menu_2" parent="gestion_activos_intangibles.menu_root"/>
--->
-    <!-- actions -->
-<!--
-    <menuitem name="List" id="gestion_activos_intangibles.menu_1_list" parent="gestion_activos_intangibles.menu_1"
-              action="gestion_activos_intangibles.action_window"/>
-    <menuitem name="Server to list" id="gestion_activos_intangibles" parent="gestion_activos_intangibles.menu_2"
-              action="gestion_activos_intangibles.action_server"/>
--->
+  <menuitem id="menu_activo_intangible_root" 
+          name="Activos Intangibles" 
+          sequence="10"/>
+          
+  <menuitem id="menu_activo_intangible" 
+      name="Activos" 
+      action="action_activo_intangible" 
+      parent="menu_activo_intangible_root"
+      sequence="10"/>
+      
   </data>
 </odoo>

@@ -1,17 +1,34 @@
-# from odoo import models, fields, api
+from odoo import models, fields
 
+class ActivoIntangible(models.Model):
+    _name = 'activo.intangible'
+    _description = 'tabla de activos intangibles'
 
-# class gestion_activos_intangibles(models.Model):
-#     _name = 'gestion_activos_intangibles.gestion_activos_intangibles'
-#     _description = 'gestion_activos_intangibles.gestion_activos_intangibles'
+    name = fields.Char(string="nombre", required=True)
 
-#     name = fields.Char()
-#     value = fields.Integer()
-#     value2 = fields.Float(compute="_value_pc", store=True)
-#     description = fields.Text()
-#
-#     @api.depends('value')
-#     def _value_pc(self):
-#         for record in self:
-#             record.value2 = float(record.value) / 100
+    asset_type = fields.Selection([
+        ('software', 'Software'),
+        ('hardware', 'Hardware'),
+        ('licencia', 'Licencia'),
+        ('marca', 'Marca'),
+        ('patente', 'Patente'),
+        ('copyright', 'Copyright'),
+    ], string="Tipo", required=True, default="software")
 
+    registration_number = fields.Char(string="numero de registro")
+
+    concession_date = fields.Date(string="fecha de concesion")
+    
+    renewal_date = fields.Date(string="fecha de renovacion/caducidad")
+
+    state = fields.Selection([
+        ('activo', 'Activo'),
+        ('inactivo', 'Inactivo'),
+        ('en renovacion', 'En renovacion'),
+        ('expirado', 'Expirado')
+    ], string="Estado", default="activo")
+    responsible_id = fields.Many2one('hr.employee', string="responsable")
+    expense_id = fields.Many2one('hr.expense', string="gastos") 
+
+    
+    

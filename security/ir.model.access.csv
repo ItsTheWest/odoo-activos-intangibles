@@ -1,2 +1,2 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_gestion_activos_intangibles_gestion_activos_intangibles,gestion_activos_intangibles.gestion_activos_intangibles,model_gestion_activos_intangibles_gestion_activos_intangibles,base.group_user,1,1,1,1
+access_activo_intangible,activo.intangible,model_activo_intangible,base.group_user,1,1,1,1
