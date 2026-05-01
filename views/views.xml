@@ -1,59 +1,118 @@
 <odoo>
   <data>
-  `interfaz que muestra el formulaio de llenado para los datos de los activos intangibles`
-  <record id="view_activo_intangible_form" model="ir.ui.view">
-    <field name="name">activo.intangible.form</field> 
-    <field name="model">activo.intangible</field>
-    <field name="arch" type="xml">
-      <form>
-        <sheet>
-          <group>
-            <field name="name"/>
-            <field name="asset_type"/>
-            <field name="registration_number"/>
-            <field name="concession_date"/>
-            <field name="renewal_date"/>
-            <field name="responsible_id"/>
-            <field name="expense_id"/>
-          </group>
-        </sheet>
-      </form>
-    </field>
-  </record>
+    <!-- ========================================================= -->
+    <!-- 1. VISTA DE FORMULARIO (FORM VIEW)                        -->
+    <!-- ========================================================= -->
+    <!-- <record>: Crea un registro en la base de datos de Odoo. 
+         'model="ir.ui.view"' le dice a Odoo que este registro es una vista de interfaz de usuario. -->
+    <record id="view_activo_intangible_form" model="ir.ui.view">
+      <field name="name">activo.intangible.form</field>  <!-- <field name="name">: Nombre técnico interno de la vista. -->
+      <field name="model">activo.intangible</field>  <!-- <field name="model">: Indica a qué tabla (modelo de Python) pertenece esta vista. -->
+      <field name="arch" type="xml">   <!-- <field name="arch" type="xml">: Aquí dentro va la arquitectura visual de la vista en código XML. -->
+        <form string="Activo Intangible">
+          <!-- <header>: Es la barra gris superior. Se usa para botones de acción y la barra de estado (workflow). -->
+          <header>
+            <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state != 'activo'"/>
+            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state != 'inactivo'"/>
+            
+            <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
+            <field name="state" widget="statusbar" statusbar_visible="activo,inactivo"/>
+          </header>
+          <sheet>
+            
+            <!-- <div class="oe_title">: Clase CSS estándar de Odoo para el título principal del registro. Letra grande y destacada. -->
+            <!-- Agregamos mb-4 (Margin Bottom 4) de Bootstrap para separar el título de los campos de abajo -->
+            <div class="oe_title mb-4">
+              <!-- <label>: Texto descriptivo del campo. 'oe_edit_only' hace que la etiqueta solo se vea cuando estás editando, no cuando solo estás leyendo. -->
+              <label for="name" class="oe_edit_only" string="Nombre del Activo"/>
+              <h1>
+                <field name="name" placeholder="Ej. Software de Contabilidad..."/>
+              </h1>
+            </div>
+            
+            <!-- <group>: Organiza los campos. Un <group> dentro de otro <group> crea columnas (para aprovechar el ancho de la pantalla). -->
+            <group>
+              <!-- Agregar 'string="..."' dibuja una línea y un título para agrupar los campos visualmente. -->
+              <group string="Datos Generales">
+                <field name="asset_type"/>
+                <field name="registration_number" placeholder="Ej. REG-12345"/>
+              </group>
+              
+              <group string="Fechas Clave">
+                <field name="concession_date"/>
+                <field name="renewal_date"/>
+              </group>
+            </group>
+            
+            <!-- <notebook>: Crea la sección inferior con Pestañas (Tabs) para información secundaria. -->
+            <notebook>
+              <!-- <page>: Cada pestaña dentro del notebook. -->
+              <page string="Información Adicional">
+                <group>
+                  <field name="responsible_id" widget="many2one_avatar"/>
+                  <field name="expense_id"/>
+                </group>
+              </page>
+            </notebook>
+            
+          </sheet>
+        </form>
+      </field>
+    </record>
 
- `lista de activos intangibles`
-  <record id="view_activo_intangible_list" model="ir.ui.view">
-    <field name="name">activo.intangible.list</field>
-    <field name="model">activo.intangible</field>
-    <field name="arch" type="xml">
-      <list>
-        <field name="name"/>
-        <field name="asset_type"/>
-        <field name="registration_number"/>
-        <field name="concession_date"/>
-        <field name="renewal_date"/>
-        <field name="responsible_id"/>
-        <field name="expense_id"/>
-        <field name="state"/>
-      </list>
-    </field>
-  </record>
+    <!-- ========================================================= -->
+    <!-- 2. VISTA DE LISTA (TREE / LIST VIEW)                      -->
+    <!-- ========================================================= -->
+    <record id="view_activo_intangible_list" model="ir.ui.view">
+      <field name="name">activo.intangible.list</field>
+      <field name="model">activo.intangible</field>
+      <field name="arch" type="xml">
+        <!-- <list>: Define una vista de tabla o lista para ver múltiples registros a la vez. -->
+        <list string="Activos Intangibles">
+          <field name="name"/>
+          <field name="asset_type"/>
+          <field name="registration_number"/>
+          <field name="concession_date"/>
+          <field name="renewal_date"/>
+          <field name="responsible_id" widget="many2one_avatar"/>
+          <field name="expense_id"/>
+          <!-- widget="badge": Transforma el texto del estado en una etiqueta con color (decoration-info=celeste, decoration-success=verde) -->
+          <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'active'"/>
+        </list>
+      </field>
+    </record>
 
-  <record id="action_activo_intangible" model="ir.actions.act_window">
-    <field name="name">activo.intangible.action</field>
-    <field name="res_model">activo.intangible</field>
-    <field name="view_mode">list,form</field>
-  </record>
+    <!-- ========================================================= -->
+    <!-- 3. ACCIÓN DE VENTANA (WINDOW ACTION)                      -->
+    <!-- ========================================================= -->
+    <!-- Las acciones son lo que Odoo ejecuta cuando haces clic en un menú. Unen los menús con las vistas. -->
+    <record id="action_activo_intangible" model="ir.actions.act_window">
+      <field name="name">Activos Intangibles</field>
+      <field name="res_model">activo.intangible</field>
+      <!-- <view_mode>: Define qué vistas se pueden abrir y en qué orden (primero la lista, luego el formulario). -->
+      <field name="view_mode">list,form</field>
+      <!-- <help>: El mensaje que aparece cuando no hay ningún registro creado (pantalla vacía). -->
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Crea tu primer activo intangible!
+        </p>
+      </field>
+    </record>
 
-  <menuitem id="menu_activo_intangible_root" 
-          name="Activos Intangibles" 
-          sequence="10"/>
-          
-  <menuitem id="menu_activo_intangible" 
-      name="Activos" 
-      action="action_activo_intangible" 
-      parent="menu_activo_intangible_root"
-      sequence="10"/>
-      
+    <!-- ========================================================= -->
+    <!-- 4. MENÚS (MENUITEMS)                                      -->
+    <!-- ========================================================= -->
+    <!-- <menuitem>: Los botones de navegación en la barra superior o lateral. -->
+    <menuitem id="menu_activo_intangible_root" 
+            name="Activos Intangibles" 
+            sequence="10"/>
+            
+    <!-- Menú hijo que ejecuta la acción definida arriba. -->
+    <menuitem id="menu_activo_intangible" 
+        name="Activos" 
+        action="action_activo_intangible" 
+        parent="menu_activo_intangible_root"
+        sequence="10"/>
+        
   </data>
 </odoo>

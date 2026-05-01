@@ -17,7 +17,7 @@ Long description of module's purpose
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base','hr', 'account'],
+    'depends': ['base','hr', 'account', 'hr_expense'],
 
     # always loaded
     'data': [

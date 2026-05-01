@@ -27,8 +27,14 @@ class ActivoIntangible(models.Model):
         ('en renovacion', 'En renovacion'),
         ('expirado', 'Expirado')
     ], string="Estado", default="activo")
+    
     responsible_id = fields.Many2one('hr.employee', string="responsable")
     expense_id = fields.Many2one('hr.expense', string="gastos") 
 
-    
-    
+    def action_inactivar(self):
+        for record in self:
+            record.state = 'inactivo'
+
+    def action_renovar(self):
+        for record in self:
+            record.state = 'activo'
