@@ -15,7 +15,6 @@
             <field name="interval_type">days</field>
             <!-- Runs every night at 00:00 UTC -->
             <field name="nextcall" eval="(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
-            <field name="numbercall">-1</field>
             <field name="active">True</field>
             <field name="user_id" ref="base.user_root"/>
         </record>
