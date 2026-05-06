@@ -51,54 +51,60 @@ class ActivoIntangible(models.Model):
     def _cron_check_vencement(self):
         """
         Scheduled action (cron) that runs nightly.
-        Finds all 'activo' assets whose renewal_date is exactly 30 days from today
-        and creates a 'To Do' activity to alert the responsible user.
+        1. Marks assets as 'expirado' if their renewal date has passed.
+        2. Marks assets as 'en renovacion' if they expire in 30 days or less and creates an activity.
         """
-        # Calculate the exact date that is 30 days from now.
-        alert_date = fields.Date.today() + timedelta(days=30)
+        today = fields.Date.today()
+        alert_limit = today + timedelta(days=30)
+        
+        # 1. PROCESS EXPIRED ASSETS
+        # Find assets that are still active or in renovation but their date has already passed.
+        expired_assets = self.search([
+            ('state', 'in', ['activo', 'en renovacion']),
+            ('renewal_date', '<', today),
+        ])
+        for asset in expired_assets:
+            asset.state = 'expirado'
+            _logger.info("Cron [Activos Intangibles]: Asset '%s' (ID: %s) marked as EXPIRED.", asset.name, asset.id)
 
-        # Search only for assets that are active AND have a renewal date in 30 days.
-        # This prevents duplicate alerts for already processed or inactive assets.
-        expiring_assets = self.search([
+        # 2. PROCESS ASSETS NEAR EXPIRATION (30 Days)
+        # We only process 'activo' assets to avoid re-triggering for those already 'en renovacion'.
+        near_expiry_assets = self.search([
             ('state', '=', 'activo'),
-            ('renewal_date', '=', alert_date),
+            ('renewal_date', '!=', False),
+            ('renewal_date', '<=', alert_limit),
+            ('renewal_date', '>=', today),
         ])
 
-        if not expiring_assets:
-            _logger.info("Cron [Activos Intangibles]: No assets expiring in 30 days. No alerts created.")
+        if not near_expiry_assets and not expired_assets:
+            _logger.info("Cron [Activos Intangibles]: No state transitions needed today.")
             return
 
-        # Retrieve the "To Do" activity type, which is standard in all Odoo installations.
         activity_type = self.env.ref('mail.mail_activity_data_todo')
 
-        for asset in expiring_assets:
-            # Determine the user to notify.
-            # Priority: the employee's linked user > the current company admin user.
+        for asset in near_expiry_assets:
+            # Change state
+            asset.state = 'en renovacion'
+
+            # Determine the user to notify
             user_id = (
                 asset.responsible_id.user_id.id
                 if asset.responsible_id and asset.responsible_id.user_id
                 else self.env.company.partner_id.user_ids[:1].id
             )
 
-            if not user_id:
-                _logger.warning(
-                    "Cron [Activos Intangibles]: Asset '%s' (ID: %s) has no responsible user. Skipping.",
-                    asset.name, asset.id
+            if user_id:
+                asset.activity_schedule(
+                    activity_type_id=activity_type.id,
+                    summary=f"⚠️ Vencimiento próximo: {asset.name}",
+                    note=(
+                        f"El activo intangible <b>{asset.name}</b> "
+                        f"(Tipo: {dict(asset._fields['asset_type'].selection).get(asset.asset_type)}) "
+                        f"vence el <b>{asset.renewal_date.strftime('%d/%m/%Y')}</b>. "
+                        f"El sistema ha cambiado su estado a <b>En renovación</b> automáticamente."
+                    ),
+                    user_id=user_id,
                 )
-                continue
-
-            asset.activity_schedule(
-                activity_type_id=activity_type.id,
-                summary=f"⚠️ Vencimiento próximo: {asset.name}",
-                note=(
-                    f"El activo intangible <b>{asset.name}</b> "
-                    f"(Tipo: {dict(asset._fields['asset_type'].selection).get(asset.asset_type)}) "
-                    f"vence el <b>{asset.renewal_date.strftime('%d/%m/%Y')}</b>. "
-                    f"Por favor, inicie el proceso de renovación a la brevedad."
-                ),
-                user_id=user_id,
-            )
-            _logger.info(
-                "Cron [Activos Intangibles]: Activity created for asset '%s' (ID: %s), expiring on %s.",
-                asset.name, asset.id, asset.renewal_date
-            )
+                _logger.info("Cron [Activos Intangibles]: Asset '%s' (ID: %s) transitioned to 'en renovacion' and notified.", asset.name, asset.id)
+            else:
+                _logger.warning("Cron [Activos Intangibles]: Asset '%s' (ID: %s) has no responsible user to notify.", asset.name, asset.id)
