@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!--
+            noupdate="1": This record is created on install but never overwritten
+            on subsequent module upgrades. This prevents resetting the cron's
+            next execution time after every update.
+        -->
+        <record id="ir_cron_check_activo_intangible_vencement" model="ir.cron">
+            <field name="name">Activos Intangibles: Verificar Vencimiento (30 días)</field>
+            <field name="model_id" ref="model_activo_intangible"/>
+            <field name="state">code</field>
+            <field name="code">model._cron_check_vencement()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <!-- Runs every night at 00:00 UTC -->
+            <field name="nextcall" eval="(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)).strftime('%Y-%m-%d %H:%M:%S')"/>
+            <field name="numbercall">-1</field>
+            <field name="active">True</field>
+            <field name="user_id" ref="base.user_root"/>
+        </record>
+    </data>
+</odoo>
