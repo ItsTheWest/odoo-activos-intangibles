@@ -16,7 +16,7 @@
             <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state != 'inactivo'"/>
             
             <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
-            <field name="state" widget="statusbar" statusbar_visible="activo,inactivo"/>
+            <field name="state" widget="statusbar" statusbar_visible="activo,en renovacion,expirado,inactivo"/>
           </header>
           <sheet>
             
@@ -77,7 +77,7 @@
           <field name="responsible_id" widget="many2one_avatar"/>
           <field name="expense_id"/>
           <!-- widget="badge": Transforma el texto del estado en una etiqueta con color (decoration-info=celeste, decoration-success=verde) -->
-          <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'active'"/>
+          <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-info="state == 'inactivo'" decoration-warning="state == 'en renovacion'" decoration-danger="state == 'expirado'"/>
         </list>
       </field>
     </record>
