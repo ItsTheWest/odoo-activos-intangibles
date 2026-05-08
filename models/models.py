@@ -1,11 +1,12 @@
-from odoo import models, fields, api
+from odoo import models, fields, api, _  # type: ignore
+from odoo.exceptions import UserError  # type: ignore
 from datetime import timedelta
 import logging
 
 _logger = logging.getLogger(__name__)
 
 
-class ActivoIntangible(models.Model):
+class ActivoIntangible(models.Model): 
     _name = 'activo.intangible'
     _description = 'tabla de activos intangibles'
     # mail.thread enables chatter/messaging on records.
@@ -45,6 +46,10 @@ class ActivoIntangible(models.Model):
 
     def action_renovar(self):
         for record in self:
+            if not record.renewal_date:
+                raise UserError("Error: No se puede activar el activo sin una Fecha de Renovación.")
+            if record.renewal_date <= fields.Date.today():
+                raise UserError(f"Error: La fecha de renovación ({record.renewal_date}) ya ha pasado. Por favor, actualice la fecha antes de activar.")
             record.state = 'activo'
 
     @api.model

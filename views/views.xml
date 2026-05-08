@@ -13,7 +13,7 @@
           <!-- <header>: Es la barra gris superior. Se usa para botones de acción y la barra de estado (workflow). -->
           <header>
             <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state != 'activo'"/>
-            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state != 'inactivo'"/>
+            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state != 'inactivo'" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
             
             <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
             <field name="state" widget="statusbar" statusbar_visible="activo,en renovacion,expirado,inactivo"/>
