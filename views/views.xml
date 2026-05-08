@@ -109,43 +109,16 @@
       </field>
     </record>
 
-    <!-- ========================================================= -->
-    <!-- 4. VISTA DE GRÁFICO (GRAPH VIEW)                          -->
-    <!-- ========================================================= -->
-    <record id="view_activo_intangible_graph" model="ir.ui.view">
-      <field name="name">activo.intangible.graph</field>
-      <field name="model">activo.intangible</field>
-      <field name="arch" type="xml">
-        <graph string="Estadísticas de Activos Intangibles" type="bar">
-          <field name="asset_type"/>
-          <field name="state"/>
-        </graph>
-      </field>
-    </record>
 
     <!-- ========================================================= -->
-    <!-- 5. VISTA PIVOT (PIVOT VIEW)                               -->
-    <!-- ========================================================= -->
-    <record id="view_activo_intangible_pivot" model="ir.ui.view">
-      <field name="name">activo.intangible.pivot</field>
-      <field name="model">activo.intangible</field>
-      <field name="arch" type="xml">
-        <pivot string="Análisis de Activos Intangibles">
-          <field name="asset_type" type="row"/>
-          <field name="state" type="col"/>
-        </pivot>
-      </field>
-    </record>
-
-    <!-- ========================================================= -->
-    <!-- 6. ACCIÓN DE VENTANA (WINDOW ACTION)                      -->
+    <!-- 4. ACCIÓN DE VENTANA (WINDOW ACTION)                      -->
     <!-- ========================================================= -->
     <!-- Las acciones son lo que Odoo ejecuta cuando haces clic en un menú. Unen los menús con las vistas. -->
     <record id="action_activo_intangible" model="ir.actions.act_window">
       <field name="name">Activos Intangibles</field>
       <field name="res_model">activo.intangible</field>
-      <!-- <view_mode>: Define qué vistas se pueden abrir y en qué orden. -->
-      <field name="view_mode">list,form,graph,pivot</field>
+      <!-- <view_mode>: Define qué vistas se pueden abrir y en qué orden (primero la lista, luego el formulario). -->
+      <field name="view_mode">list,form</field>
       <field name="search_view_id" ref="view_activo_intangible_search"/>
       <!-- <help>: El mensaje que aparece cuando no hay ningún registro creado (pantalla vacía). -->
       <field name="help" type="html">
@@ -156,7 +129,7 @@
     </record>
 
     <!-- ========================================================= -->
-    <!-- 7. MENÚS (MENUITEMS)                                      -->
+    <!-- 5. MENÚS (MENUITEMS)                                      -->
     <!-- ========================================================= -->
     <!-- <menuitem>: Los botones de navegación en la barra superior o lateral. -->
     <menuitem id="menu_activo_intangible_root" 
