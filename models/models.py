@@ -58,8 +58,6 @@ class ActivoIntangible(models.Model):
             if record.concession_date and record.renewal_date:
                 if record.concession_date > record.renewal_date:
                     raise ValidationError("Error: La fecha de concesión no puede ser mayor a la fecha de renovación/caducidad.")
-            if record.renewal_date and record.renewal_date <= fields.Date.today():
-                record.state = 'expirado'
 
     @api.onchange('concession_date', 'renewal_date')
     def _onchange_dates(self):
