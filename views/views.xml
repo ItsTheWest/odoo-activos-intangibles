@@ -83,14 +83,70 @@
     </record>
 
     <!-- ========================================================= -->
-    <!-- 3. ACCIÓN DE VENTANA (WINDOW ACTION)                      -->
+    <!-- 3. VISTA DE BÚSQUEDA (SEARCH VIEW)                        -->
+    <!-- ========================================================= -->
+    <record id="view_activo_intangible_search" model="ir.ui.view">
+      <field name="name">activo.intangible.search</field>
+      <field name="model">activo.intangible</field>
+      <field name="arch" type="xml">
+        <search string="Buscar Activos Intangibles">
+          <field name="name"/>
+          <field name="asset_type"/>
+          <field name="state"/>
+          <field name="responsible_id"/>
+          
+          <separator/>
+          <filter string="Activos" name="filter_activo" domain="[('state', '=', 'activo')]"/>
+          <filter string="Expirados" name="filter_expirado" domain="[('state', '=', 'expirado')]"/>
+          <filter string="En Renovación" name="filter_en_renovacion" domain="[('state', '=', 'en renovacion')]"/>
+          
+          <group expand="0" string="Agrupar Por">
+            <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type'}"/>
+            <filter string="Estado" name="group_by_state" context="{'group_by':'state'}"/>
+            <filter string="Responsable" name="group_by_responsible" context="{'group_by':'responsible_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- 4. VISTA DE GRÁFICO (GRAPH VIEW)                          -->
+    <!-- ========================================================= -->
+    <record id="view_activo_intangible_graph" model="ir.ui.view">
+      <field name="name">activo.intangible.graph</field>
+      <field name="model">activo.intangible</field>
+      <field name="arch" type="xml">
+        <graph string="Estadísticas de Activos Intangibles" type="bar">
+          <field name="asset_type"/>
+          <field name="state"/>
+        </graph>
+      </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- 5. VISTA PIVOT (PIVOT VIEW)                               -->
+    <!-- ========================================================= -->
+    <record id="view_activo_intangible_pivot" model="ir.ui.view">
+      <field name="name">activo.intangible.pivot</field>
+      <field name="model">activo.intangible</field>
+      <field name="arch" type="xml">
+        <pivot string="Análisis de Activos Intangibles">
+          <field name="asset_type" type="row"/>
+          <field name="state" type="col"/>
+        </pivot>
+      </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- 6. ACCIÓN DE VENTANA (WINDOW ACTION)                      -->
     <!-- ========================================================= -->
     <!-- Las acciones son lo que Odoo ejecuta cuando haces clic en un menú. Unen los menús con las vistas. -->
     <record id="action_activo_intangible" model="ir.actions.act_window">
       <field name="name">Activos Intangibles</field>
       <field name="res_model">activo.intangible</field>
-      <!-- <view_mode>: Define qué vistas se pueden abrir y en qué orden (primero la lista, luego el formulario). -->
-      <field name="view_mode">list,form</field>
+      <!-- <view_mode>: Define qué vistas se pueden abrir y en qué orden. -->
+      <field name="view_mode">list,form,graph,pivot</field>
+      <field name="search_view_id" ref="view_activo_intangible_search"/>
       <!-- <help>: El mensaje que aparece cuando no hay ningún registro creado (pantalla vacía). -->
       <field name="help" type="html">
         <p class="o_view_nocontent_smiling_face">
@@ -100,7 +156,7 @@
     </record>
 
     <!-- ========================================================= -->
-    <!-- 4. MENÚS (MENUITEMS)                                      -->
+    <!-- 7. MENÚS (MENUITEMS)                                      -->
     <!-- ========================================================= -->
     <!-- <menuitem>: Los botones de navegación en la barra superior o lateral. -->
     <menuitem id="menu_activo_intangible_root" 
