@@ -90,16 +90,15 @@
       <field name="model">activo.intangible</field>
       <field name="arch" type="xml">
         <search string="Buscar Activos Intangibles">
+          <!-- Only Char and Many2one fields are valid as <field> in search views. -->
+          <!-- Selection fields (state, asset_type) are handled via <filter> below. -->
           <field name="name"/>
-          <field name="asset_type"/>
-          <field name="state"/>
           <field name="responsible_id"/>
-          
-          <separator/>
+
           <filter string="Activos" name="filter_activo" domain="[('state', '=', 'activo')]"/>
           <filter string="Expirados" name="filter_expirado" domain="[('state', '=', 'expirado')]"/>
           <filter string="En Renovación" name="filter_en_renovacion" domain="[('state', '=', 'en renovacion')]"/>
-          
+
           <group expand="0" string="Agrupar Por">
             <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type'}"/>
             <filter string="Estado" name="group_by_state" context="{'group_by':'state'}"/>
