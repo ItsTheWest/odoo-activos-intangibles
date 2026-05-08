@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _  # type: ignore
-from odoo.exceptions import UserError  # type: ignore
+from odoo.exceptions import UserError, ValidationError  # type: ignore
 from datetime import timedelta
 import logging
 
@@ -51,6 +51,27 @@ class ActivoIntangible(models.Model):
             if record.renewal_date <= fields.Date.today():
                 raise UserError(f"Error: La fecha de renovación ({record.renewal_date}) ya ha pasado. Por favor, actualice la fecha antes de activar.")
             record.state = 'activo'
+
+    @api.constrains('concession_date', 'renewal_date')
+    def _check_dates(self):
+        for record in self:
+            if record.concession_date and record.renewal_date:
+                if record.concession_date > record.renewal_date:
+                    raise ValidationError("Error: La fecha de concesión no puede ser mayor a la fecha de renovación/caducidad.")
+            if record.renewal_date and record.renewal_date <= fields.Date.today():
+                record.state = 'expirado'
+
+    @api.onchange('concession_date', 'renewal_date')
+    def _onchange_dates(self):
+        if self.concession_date and self.renewal_date:
+            if self.concession_date > self.renewal_date:
+                return {
+                    'warning': {
+                        'title': "Validación de Fechas",
+                        'message': "La fecha de concesión no debería ser mayor a la fecha de renovación/caducidad. Por favor, verifique."
+                    }
+                }
+
 
     @api.model
     def _cron_check_vencement(self):
