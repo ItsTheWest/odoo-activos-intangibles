@@ -13,10 +13,10 @@
           <!-- <header>: Es la barra gris superior. Se usa para botones de acción y la barra de estado (workflow). -->
           <header>
             <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state != 'activo'"/>
-            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state != 'inactivo'" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
+            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state not in ('inactivo', 'expirado')" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
             
             <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
-            <field name="state" widget="statusbar" statusbar_visible="activo,en renovacion,expirado,inactivo"/>
+            <field name="state" widget="statusbar" statusbar_visible="activo,expirado,inactivo"/>
           </header>
           <sheet>
             
@@ -77,7 +77,7 @@
           <field name="responsible_id" widget="many2one_avatar"/>
           <field name="expense_id"/>
           <!-- widget="badge": Transforma el texto del estado en una etiqueta con color (decoration-info=celeste, decoration-success=verde) -->
-          <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-info="state == 'inactivo'" decoration-warning="state == 'en renovacion'" decoration-danger="state == 'expirado'"/>
+          <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-info="state == 'inactivo'" decoration-danger="state == 'expirado'"/>
         </list>
       </field>
     </record>
@@ -90,16 +90,13 @@
       <field name="model">activo.intangible</field>
       <field name="arch" type="xml">
         <search string="Buscar Activos Intangibles">
-          <!-- Only Char and Many2one fields are valid as <field> in search views. -->
-          <!-- Selection fields (state, asset_type) are handled via <filter> below. -->
           <field name="name"/>
           <field name="responsible_id"/>
 
           <filter string="Activos" name="filter_activo" domain="[('state', '=', 'activo')]"/>
           <filter string="Expirados" name="filter_expirado" domain="[('state', '=', 'expirado')]"/>
-          <filter string="En Renovación" name="filter_en_renovacion" domain="[('state', '=', 'en renovacion')]"/>
 
-          <group expand="0" string="Agrupar Por">
+          <group>
             <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type'}"/>
             <filter string="Estado" name="group_by_state" context="{'group_by':'state'}"/>
             <filter string="Responsable" name="group_by_responsible" context="{'group_by':'responsible_id'}"/>
