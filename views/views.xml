@@ -34,7 +34,7 @@
             <group>
               <!-- Agregar 'string="..."' dibuja una línea y un título para agrupar los campos visualmente. -->
               <group string="Datos Generales">
-                <field name="asset_type"/>
+                <field name="asset_type_id"/>
                 <field name="registration_number" placeholder="Ej. REG-12345"/>
               </group>
               
@@ -70,7 +70,7 @@
         <!-- <list>: Define una vista de tabla o lista para ver múltiples registros a la vez. -->
         <list string="Activos Intangibles">
           <field name="name"/>
-          <field name="asset_type"/>
+          <field name="asset_type_id"/>
           <field name="registration_number"/>
           <field name="concession_date"/>
           <field name="renewal_date"/>
@@ -97,7 +97,7 @@
           <filter string="Expirados" name="filter_expirado" domain="[('state', '=', 'expirado')]"/>
 
           <group>
-            <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type'}"/>
+            <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type_id'}"/>
             <filter string="Estado" name="group_by_state" context="{'group_by':'state'}"/>
             <filter string="Responsable" name="group_by_responsible" context="{'group_by':'responsible_id'}"/>
           </group>
@@ -137,6 +137,62 @@
         name="Activos" 
         action="action_activo_intangible" 
         parent="menu_activo_intangible_root"
+        sequence="10"/>
+
+    <menuitem id="menu_activo_intangible_config"
+        name="Configuración"
+        parent="menu_activo_intangible_root"
+        sequence="100"/>
+
+    <!-- ========================================================= -->
+    <!-- 6. VISTAS Y MENUS PARA TIPOS DE ACTIVOS                   -->
+    <!-- ========================================================= -->
+    <record id="view_activo_intangible_type_form" model="ir.ui.view">
+      <field name="name">activo.intangible.type.form</field>
+      <field name="model">activo.intangible.type</field>
+      <field name="arch" type="xml">
+        <form string="Tipo de Activo Intangible">
+          <sheet>
+            <div class="oe_title">
+              <label for="name" class="oe_edit_only" string="Nombre del Tipo"/>
+              <h1><field name="name" placeholder="Ej. Software, Licencia"/></h1>
+            </div>
+            <group>
+              <group>
+                <field name="code"/>
+                <field name="lifespan_days"/>
+              </group>
+              <group>
+                <field name="description"/>
+              </group>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_activo_intangible_type_list" model="ir.ui.view">
+      <field name="name">activo.intangible.type.list</field>
+      <field name="model">activo.intangible.type</field>
+      <field name="arch" type="xml">
+        <list string="Tipos de Activos">
+          <field name="name"/>
+          <field name="code"/>
+          <field name="lifespan_days"/>
+        </list>
+      </field>
+    </record>
+
+    <record id="action_activo_intangible_type" model="ir.actions.act_window">
+      <field name="name">Tipos de Activos</field>
+      <field name="res_model">activo.intangible.type</field>
+      <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_activo_intangible_type"
+        name="Tipos de Activos"
+        parent="menu_activo_intangible_config"
+        action="action_activo_intangible_type"
         sequence="10"/>
         
   </data>
