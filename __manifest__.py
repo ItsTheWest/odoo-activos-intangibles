@@ -23,6 +23,7 @@ Long description of module's purpose
     'data': [
         'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
+        'data/data.xml',
         'views/views.xml',
         'views/statistics_views.xml',
         'views/templates.xml',

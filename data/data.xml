@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Tipos de Activos por Defecto -->
+        <record id="activo_type_software" model="activo.intangible.type">
+            <field name="name">Software</field>
+            <field name="code">SOFT</field>
+            <field name="lifespan_days">365</field>
+            <field name="description">Sistemas y programas informáticos con licencia anual o perpetua.</field>
+        </record>
+
+        <record id="activo_type_hardware" model="activo.intangible.type">
+            <field name="name">Hardware</field>
+            <field name="code">HARD</field>
+            <field name="lifespan_days">1095</field>
+            <field name="description">Equipos físicos con una vida útil estimada de 3 años.</field>
+        </record>
+
+        <record id="activo_type_licencia" model="activo.intangible.type">
+            <field name="name">Licencia</field>
+            <field name="code">LIC</field>
+            <field name="lifespan_days">365</field>
+            <field name="description">Licencias de uso temporal.</field>
+        </record>
+
+        <record id="activo_type_marca" model="activo.intangible.type">
+            <field name="name">Marca</field>
+            <field name="code">MARC</field>
+            <field name="lifespan_days">3650</field>
+            <field name="description">Marcas registradas con vigencia de 10 años.</field>
+        </record>
+
+        <record id="activo_type_patente" model="activo.intangible.type">
+            <field name="name">Patente</field>
+            <field name="code">PAT</field>
+            <field name="lifespan_days">7300</field>
+            <field name="description">Patentes de invención con vigencia de 20 años.</field>
+        </record>
+
+        <record id="activo_type_copyright" model="activo.intangible.type">
+            <field name="name">Copyright</field>
+            <field name="code">COPY</field>
+            <field name="lifespan_days">25550</field>
+            <field name="description">Derechos de autor.</field>
+        </record>
+    </data>
+</odoo>
