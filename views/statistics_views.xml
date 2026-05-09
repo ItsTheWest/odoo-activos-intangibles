@@ -13,7 +13,7 @@
       <field name="arch" type="xml">
         <graph string="Estadísticas de Activos Intangibles" type="bar" stacked="True">
           <!-- type="row": eje principal (eje X) -->
-          <field name="asset_type" type="row"/>
+          <field name="asset_type_id" type="row"/>
           <!-- type="col": desglose por columna (color en el gráfico) -->
           <field name="state" type="col"/>
         </graph>
@@ -31,7 +31,7 @@
       <field name="model">activo.intangible</field>
       <field name="arch" type="xml">
         <pivot string="Análisis de Activos Intangibles" display_quantity="true">
-          <field name="asset_type" type="row"/>
+          <field name="asset_type_id" type="row"/>
           <field name="state" type="col"/>
         </pivot>
       </field>
