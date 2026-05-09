@@ -5,6 +5,15 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+class ActivoIntangibleType(models.Model):
+    _name = 'activo.intangible.type'
+    _description = 'Tipos de Activos Intangibles'
+
+    name = fields.Char(string="Tipo de Activo", required=True)
+    code = fields.Char(string="Código", help="Código interno del tipo de activo")
+    lifespan_days = fields.Integer(string="Días de Vigencia", default=0, help="Días predeterminados para la fecha de renovación/caducidad")
+    description = fields.Text(string="Descripción")
+
 
 class ActivoIntangible(models.Model): 
     _name = 'activo.intangible'
@@ -15,14 +24,7 @@ class ActivoIntangible(models.Model):
 
     name = fields.Char(string="nombre", required=True, tracking=True)
 
-    asset_type = fields.Selection([
-        ('software', 'Software'),
-        ('hardware', 'Hardware'),
-        ('licencia', 'Licencia'),
-        ('marca', 'Marca'),
-        ('patente', 'Patente'),
-        ('copyright', 'Copyright'),
-    ], string="Tipo", required=True, default="software", tracking=True)
+    asset_type_id = fields.Many2one('activo.intangible.type', string="Tipo", required=True, tracking=True)
 
     registration_number = fields.Char(string="numero de registro")
 
@@ -66,6 +68,11 @@ class ActivoIntangible(models.Model):
                         'message': "La fecha de concesión no debería ser mayor a la fecha de renovación/caducidad. Por favor, verifique."
                     }
                 }
+
+    @api.onchange('asset_type_id', 'concession_date')
+    def _onchange_asset_type_dates(self):
+        if self.asset_type_id and self.asset_type_id.lifespan_days > 0 and self.concession_date:
+            self.renewal_date = self.concession_date + timedelta(days=self.asset_type_id.lifespan_days)
 
 
     @api.model
