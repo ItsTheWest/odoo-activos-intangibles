@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- ================================================================
+         REPOSITORIO DE EVIDENCIAS DIGITALES
+         ================================================================
+         This file registers the "Repositorio" section of the module.
+
+         Design decision: we reuse the existing activo.intangible model
+         (no new table). The repository is simply a focused LIST view of
+         all assets that shows the document_count column prominently, so
+         users can spot which assets are missing documentation at a glance.
+
+         For individual file management the user drills into a record and
+         uses the "Evidencias Digitales" tab or the smart button.
+         ================================================================ -->
+
+    <!-- =================================================================
+         1. LIST VIEW — "Repositorio de Evidencias"
+         A lean view centred on the documentation status of each asset.
+         The document_count column is the focal point here.
+         ================================================================= -->
+    <record id="view_evidence_repository_list" model="ir.ui.view">
+      <field name="name">activo.intangible.evidence.list</field>
+      <field name="model">activo.intangible</field>
+      <field name="arch" type="xml">
+        <list string="Repositorio de Evidencias Digitales"
+              decoration-danger="document_count == 0"
+              decoration-success="document_count > 0">
+          <!-- decoration-danger highlights assets with NO documents in red,
+               so the compliance gap is immediately visible. -->
+          <field name="name" string="Activo"/>
+          <field name="asset_type_id" string="Tipo"/>
+          <field name="registration_number" string="N° Registro"/>
+          <field name="renewal_date" string="Vence"/>
+          <field name="responsible_id" widget="many2one_avatar" string="Responsable"/>
+          <field name="state"
+                 widget="badge"
+                 decoration-success="state == 'activo'"
+                 decoration-info="state == 'inactivo'"
+                 decoration-danger="state == 'expirado'"
+                 string="Estado"/>
+          <!-- FOCAL COLUMN: document count. A zero means no files uploaded. -->
+          <field name="document_count" string="Documentos adjuntos"/>
+        </list>
+      </field>
+    </record>
+
+    <!-- =================================================================
+         2. WINDOW ACTION — "Repositorio de Evidencias"
+         Opens with the repository list by default, falls through to the
+         standard form view so the user can upload files from here.
+         Default grouping by asset_type_id gives a clear overview.
+         ================================================================= -->
+    <record id="action_evidence_repository" model="ir.actions.act_window">
+      <field name="name">Repositorio de Evidencias</field>
+      <field name="res_model">activo.intangible</field>
+      <!-- list first so the user sees the overview; form to drill into a record -->
+      <field name="view_mode">list,form</field>
+      <!-- Reuse the standard search view (filters, groupBy) from views.xml -->
+      <field name="search_view_id" ref="view_activo_intangible_search"/>
+      <!-- Default grouping by type gives an organised compliance overview -->
+      <field name="context">{'search_default_group_by_asset_type': 1}</field>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          No hay activos registrados aún.
+        </p>
+        <p>
+          Crea un activo intangible y adjunta su contrato o licencia en la pestaña
+          <strong>Evidencias Digitales</strong>.
+        </p>
+      </field>
+    </record>
+
+    <!-- Override: make the form view used by this action show the evidence tab
+         by opening on the page_evidence page by default. -->
+    <record id="action_evidence_repository_form_view" model="ir.actions.act_window.view">
+      <field name="act_window_id" ref="action_evidence_repository"/>
+      <field name="view_id" ref="view_activo_intangible_form"/>
+      <field name="view_mode">form</field>
+    </record>
+
+    <!-- =================================================================
+         3. MENU ITEM — "Repositorio"
+         Placed at sequence=15 so it sits between "Activos" (seq=10)
+         and "Estadísticas" (seq=20) in the top navigation bar.
+         ================================================================= -->
+    <menuitem
+      id="menu_evidence_repository"
+      name="Repositorio"
+      action="action_evidence_repository"
+      parent="menu_activo_intangible_root"
+      sequence="15"/>
+
+  </data>
+</odoo>

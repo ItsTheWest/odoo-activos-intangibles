@@ -24,6 +24,9 @@ Long description of module's purpose
         'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
         'data/data.xml',
+        # evidence_views.xml MUST come before views.xml because views.xml
+        # contains a smart button that references action_evidence_repository.
+        'views/evidence_views.xml',
         'views/views.xml',
         'views/statistics_views.xml',
         'views/templates.xml',
