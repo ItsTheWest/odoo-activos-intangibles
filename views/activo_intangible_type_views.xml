@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ========================================================= -->
+        <!-- VISTAS Y MENUS PARA TIPOS DE ACTIVOS                      -->
+        <!-- ========================================================= -->
+        
+        <!-- Acción para abrir el modal de creación al hacer clic en Nuevo -->
+        <record id="action_create_activo_intangible_type_modal" model="ir.actions.act_window">
+            <field name="name">Nuevo Tipo de Activo</field>
+            <field name="res_model">activo.intangible.type</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <!-- Formulario (Usado tanto para crear como para editar en modal) -->
+        <record id="view_activo_intangible_type_form" model="ir.ui.view">
+            <field name="name">activo.intangible.type.form</field>
+            <field name="model">activo.intangible.type</field>
+            <field name="arch" type="xml">
+                <form string="Tipo de Activo Intangible">
+                    <sheet>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only" string="Nombre del Tipo"/>
+                            <h1><field name="name" placeholder="Ej. Software, Licencia"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="code"/>
+                                <field name="lifespan_days"/>
+                            </group>
+                            <group>
+                                <field name="description"/>
+                            </group>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button string="Guardar" class="btn-primary" special="save"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!-- Kanban View -->
+        <record id="view_activo_intangible_type_kanban" model="ir.ui.view">
+            <field name="name">activo.intangible.type.kanban</field>
+            <field name="model">activo.intangible.type</field>
+            <field name="arch" type="xml">
+                <!-- Se asigna on_create para abrir el action de creación en modal -->
+                <kanban on_create="gestion_activos_intangibles.action_create_activo_intangible_type_modal">
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="lifespan_days"/>
+                    <field name="description"/>
+                    <templates>
+                        <t t-name="card">
+                            <div class="oe_kanban_global_click" type="object" name="action_edit_type" style="padding: 15px;">
+                                <div class="oe_kanban_details">
+                                    <strong class="o_kanban_record_title" style="font-size: 1.2em; color: #2c3e50;">
+                                        <field name="name"/>
+                                    </strong>
+                                    <div class="o_kanban_tags_section mt-2">
+                                        <span class="badge rounded-pill text-bg-info" style="font-size: 0.85em;">
+                                            Código: <field name="code"/>
+                                        </span>
+                                        <span class="badge rounded-pill text-bg-secondary ms-1" style="font-size: 0.85em;">
+                                            Vigencia: <field name="lifespan_days"/> días
+                                        </span>
+                                    </div>
+                                    <div class="text-muted mt-2" style="font-size: 0.9em; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">
+                                        <field name="description"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Acción Principal que abre el Kanban desde el menú -->
+        <record id="action_activo_intangible_type" model="ir.actions.act_window">
+            <field name="name">Tipos de Activos</field>
+            <field name="res_model">activo.intangible.type</field>
+            <field name="view_mode">kanban,form</field>
+        </record>
+
+        <!-- Menú -->
+        <menuitem id="menu_activo_intangible_type"
+            name="Tipos de Activos"
+            parent="menu_activo_intangible_config"
+            action="action_activo_intangible_type"
+            sequence="10"/>
+    </data>
+</odoo>
