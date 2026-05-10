@@ -41,6 +41,28 @@ class ActivoIntangible(models.Model):
     responsible_id = fields.Many2one('hr.employee', string="responsable")
     expense_id = fields.Many2one('hr.expense', string="gastos")
 
+    # ---------------------------------------------------------------
+    # DIGITAL EVIDENCE — document count via native ir.attachment
+    # We DO NOT store a binary in the model; instead, we count the
+    # attachments that Odoo already links through ir.attachment.
+    # This integrates automatically with the Chatter paperclip,
+    # email wizards, and the Odoo Documents module.
+    # ---------------------------------------------------------------
+    document_count = fields.Integer(
+        string="Documentos",
+        compute="_compute_document_count",
+        store=False,
+    )
+
+    def _compute_document_count(self):
+        """Count ir.attachment records linked to each asset record."""
+        Attachment = self.env['ir.attachment']
+        for rec in self:
+            rec.document_count = Attachment.search_count([
+                ('res_model', '=', self._name),
+                ('res_id', '=', rec.id),
+            ])
+
     def action_inactivar(self):
         for record in self:
             record.state = 'inactivo'
