@@ -73,6 +73,21 @@ class ActivoIntangible(models.Model):
         for rec in self:
             rec.document_count = len(rec.attachment_ids)
 
+    def action_get_attachment_view(self):
+        """Action to open the attachments for this specific asset from the smart button."""
+        self.ensure_one()
+        return {
+            'name': 'Documentos Adjuntos',
+            'domain': [('res_model', '=', self._name), ('res_id', '=', self.id)],
+            'res_model': 'ir.attachment',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'kanban,list,form',
+            'context': {
+                'default_res_model': self._name,
+                'default_res_id': self.id,
+            },
+        }
+
     def action_inactivar(self):
         for record in self:
             record.state = 'inactivo'

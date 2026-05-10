@@ -26,11 +26,10 @@
                  this specific asset record.
                  ===================================================== -->
             <div class="oe_button_box" name="button_box">
-              <button name="%(action_evidence_repository)s"
-                      type="action"
+              <button name="action_get_attachment_view"
+                      type="object"
                       class="oe_stat_button"
-                      icon="fa-paperclip"
-                      context="{'default_res_model': 'activo.intangible', 'default_res_id': active_id, 'search_default_res_id': active_id, 'search_default_res_model': 'activo.intangible'}">
+                      icon="fa-paperclip">
                 <field name="document_count" widget="statinfo" string="Documentos"/>
               </button>
             </div>
