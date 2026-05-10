@@ -1,3 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_activo_intangible,activo.intangible,model_activo_intangible,base.group_user,1,1,1,1
 access_activo_intangible_type,activo.intangible.type,model_activo_intangible_type,base.group_user,1,1,1,1
+access_activo_attachment_wizard,activo.attachment.wizard,model_activo_attachment_wizard,base.group_user,1,1,1,1

@@ -109,22 +109,18 @@ class ActivoIntangible(models.Model):
                 removed_attachments.sudo().unlink()
         return res
 
-    def action_get_attachment_view(self):
-        """Action to open the attachments for this specific asset from the smart button."""
+    def action_open_attachment_wizard(self):
+        """Action to open the upload wizard for digital evidences."""
         self.ensure_one()
-        tree_view_id = self.env.ref('gestion_activos_intangibles.view_attachment_custom_list').id
-        kanban_view_id = self.env.ref('gestion_activos_intangibles.view_attachment_custom_kanban').id
         return {
-            'name': 'Documentos Adjuntos',
-            'domain': [('res_model', '=', self._name), ('res_id', '=', self.id)],
-            'res_model': 'ir.attachment',
+            'name': 'Adjuntar Archivos',
             'type': 'ir.actions.act_window',
-            'view_mode': 'kanban,list,form',
-            'views': [(kanban_view_id, 'kanban'), (tree_view_id, 'list'), (False, 'form')],
+            'res_model': 'activo.attachment.wizard',
+            'view_mode': 'form',
+            'target': 'new',
             'context': {
-                'default_res_model': self._name,
-                'default_res_id': self.id,
-            },
+                'default_activo_id': self.id,
+            }
         }
 
     def action_inactivar(self):
@@ -200,3 +196,28 @@ class IrAttachment(models.Model):
             'view_id': self.env.ref('gestion_activos_intangibles.view_attachment_preview_form').id,
             'target': 'new',
         }
+
+class ActivoAttachmentWizard(models.TransientModel):
+    _name = 'activo.attachment.wizard'
+    _description = 'Wizard para subir evidencias'
+
+    activo_id = fields.Many2one('activo.intangible', string="Activo", required=True)
+    wizard_attachment_ids = fields.Many2many(
+        comodel_name='ir.attachment',
+        string="Nuevos Archivos"
+    )
+
+    def action_save_attachments(self):
+        self.ensure_one()
+        if self.wizard_attachment_ids:
+            # Enlaza los nuevos archivos al campo Many2many real del activo
+            self.activo_id.write({
+                'attachment_ids': [(4, att.id) for att in self.wizard_attachment_ids]
+            })
+            # Actualiza el registro de Odoo para vincular lógicamente
+            for att in self.wizard_attachment_ids:
+                att.write({
+                    'res_model': 'activo.intangible',
+                    'res_id': self.activo_id.id,
+                })
+        return {'type': 'ir.actions.act_window_close'}
