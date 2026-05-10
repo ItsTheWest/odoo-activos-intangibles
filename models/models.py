@@ -68,6 +68,7 @@ class ActivoIntangible(models.Model):
         store=False,
     )
 
+    @api.depends('attachment_ids')
     def _compute_document_count(self):
         """Derive count directly from the Many2many field — no extra SQL query."""
         for rec in self:
@@ -96,6 +97,8 @@ class ActivoIntangible(models.Model):
         for record in self:
             if not record.renewal_date:
                 raise UserError("Error: No se puede activar el activo sin una Fecha de Renovación.")
+            if not record.attachment_ids:
+                raise UserError("Error: No se puede activar el activo sin adjuntar al menos un documento de evidencia (contrato o licencia).")
             record.state = 'activo'
 
     @api.constrains('concession_date', 'renewal_date')
