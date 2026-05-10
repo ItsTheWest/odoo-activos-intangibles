@@ -52,10 +52,11 @@
                     <field name="name"/>
                     <field name="code"/>
                     <field name="lifespan_days"/>
+                    <field name="lifespan_display"/>
                     <field name="description"/>
                     <templates>
                         <t t-name="card">
-                            <div class="oe_kanban_global_click" type="object" name="action_edit_type" style="padding: 15px;">
+                            <a type="object" name="action_edit_type" class="w-100 h-100 text-decoration-none text-body" style="padding: 15px; display: block;">
                                 <div class="oe_kanban_details">
                                     <strong class="o_kanban_record_title" style="font-size: 1.2em; color: #2c3e50;">
                                         <field name="name"/>
@@ -65,14 +66,14 @@
                                             Código: <field name="code"/>
                                         </span>
                                         <span class="badge rounded-pill text-bg-secondary ms-1" style="font-size: 0.85em;">
-                                            Vigencia: <field name="lifespan_days"/> días
+                                            Vigencia: <field name="lifespan_display"/>
                                         </span>
                                     </div>
                                     <div class="text-muted mt-2" style="font-size: 0.9em; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">
                                         <field name="description"/>
                                     </div>
                                 </div>
-                            </div>
+                            </a>
                         </t>
                     </templates>
                 </kanban>

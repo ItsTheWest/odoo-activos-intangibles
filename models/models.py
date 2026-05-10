@@ -12,7 +12,21 @@ class ActivoIntangibleType(models.Model):
     name = fields.Char(string="Tipo de Activo", required=True)
     code = fields.Char(string="Código", help="Código interno del tipo de activo")
     lifespan_days = fields.Integer(string="Días de Vigencia", default=0, help="Días predeterminados para la fecha de renovación/caducidad")
+    lifespan_display = fields.Char(string="Vigencia (Display)", compute="_compute_lifespan_display")
     description = fields.Text(string="Descripción")
+
+    @api.depends('lifespan_days')
+    def _compute_lifespan_display(self):
+        for rec in self:
+            if rec.lifespan_days >= 365:
+                years = rec.lifespan_days // 365
+                remainder = rec.lifespan_days % 365
+                if remainder == 0:
+                    rec.lifespan_display = f"{years} año{'s' if years > 1 else ''}"
+                else:
+                    rec.lifespan_display = f"{years} año{'s' if years > 1 else ''} y {remainder} día{'s' if remainder > 1 else ''}"
+            else:
+                rec.lifespan_display = f"{rec.lifespan_days} día{'s' if rec.lifespan_days != 1 else ''}"
 
     def action_edit_type(self):
         self.ensure_one()
