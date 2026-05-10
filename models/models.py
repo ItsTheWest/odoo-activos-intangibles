@@ -14,6 +14,17 @@ class ActivoIntangibleType(models.Model):
     lifespan_days = fields.Integer(string="Días de Vigencia", default=0, help="Días predeterminados para la fecha de renovación/caducidad")
     description = fields.Text(string="Descripción")
 
+    def action_edit_type(self):
+        self.ensure_one()
+        return {
+            'name': 'Editar Tipo de Activo',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible.type',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'new',
+        }
+
 
 class ActivoIntangible(models.Model): 
     _name = 'activo.intangible'

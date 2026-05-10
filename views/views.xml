@@ -197,26 +197,52 @@
               </group>
             </group>
           </sheet>
+          <footer>
+             <button string="Cerrar" class="btn-primary" special="save"/>
+          </footer>
         </form>
       </field>
     </record>
 
-    <record id="view_activo_intangible_type_list" model="ir.ui.view">
-      <field name="name">activo.intangible.type.list</field>
+    <record id="view_activo_intangible_type_kanban" model="ir.ui.view">
+      <field name="name">activo.intangible.type.kanban</field>
       <field name="model">activo.intangible.type</field>
       <field name="arch" type="xml">
-        <list string="Tipos de Activos">
+        <kanban>
           <field name="name"/>
           <field name="code"/>
           <field name="lifespan_days"/>
-        </list>
+          <field name="description"/>
+          <templates>
+            <t t-name="kanban-box">
+              <div class="oe_kanban_global_click" type="object" name="action_edit_type" style="padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <div class="oe_kanban_details">
+                  <strong class="o_kanban_record_title" style="font-size: 1.2em; color: #2c3e50;">
+                    <field name="name"/>
+                  </strong>
+                  <div class="o_kanban_tags_section mt-2">
+                    <span class="badge rounded-pill text-bg-info" style="font-size: 0.85em;">
+                      Código: <field name="code"/>
+                    </span>
+                    <span class="badge rounded-pill text-bg-secondary ms-1" style="font-size: 0.85em;">
+                      Vigencia: <field name="lifespan_days"/> días
+                    </span>
+                  </div>
+                  <div class="text-muted mt-2" style="font-size: 0.9em; max-height: 40px; overflow: hidden; text-overflow: ellipsis;">
+                    <field name="description"/>
+                  </div>
+                </div>
+              </div>
+            </t>
+          </templates>
+        </kanban>
       </field>
     </record>
 
     <record id="action_activo_intangible_type" model="ir.actions.act_window">
       <field name="name">Tipos de Activos</field>
       <field name="res_model">activo.intangible.type</field>
-      <field name="view_mode">list,form</field>
+      <field name="view_mode">kanban,form</field>
     </record>
 
     <menuitem id="menu_activo_intangible_type"
