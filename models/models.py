@@ -42,12 +42,26 @@ class ActivoIntangible(models.Model):
     expense_id = fields.Many2one('hr.expense', string="gastos")
 
     # ---------------------------------------------------------------
-    # DIGITAL EVIDENCE — document count via native ir.attachment
-    # We DO NOT store a binary in the model; instead, we count the
-    # attachments that Odoo already links through ir.attachment.
-    # This integrates automatically with the Chatter paperclip,
-    # email wizards, and the Odoo Documents module.
+    # DIGITAL EVIDENCE — explicit Many2many to ir.attachment
+    #
+    # WHY explicit and not mail.thread's implicit attachment_ids?
+    # mail.thread only wires attachments to the Chatter internally.
+    # It does NOT expose 'attachment_ids' as a usable ORM field on
+    # the model, so the many2many_binary widget would fail with
+    # "Field does not exist" unless we declare it ourselves.
+    #
+    # This Many2many creates its own relation table
+    # (activo_intangible_ir_attachment_rel) so files uploaded here
+    # are explicitly linked to the asset record.
     # ---------------------------------------------------------------
+    attachment_ids = fields.Many2many(
+        comodel_name='ir.attachment',
+        relation='activo_intangible_ir_attachment_rel',  # explicit table name avoids collisions
+        column1='activo_id',
+        column2='attachment_id',
+        string="Evidencias Digitales",
+    )
+
     document_count = fields.Integer(
         string="Documentos",
         compute="_compute_document_count",
@@ -55,13 +69,9 @@ class ActivoIntangible(models.Model):
     )
 
     def _compute_document_count(self):
-        """Count ir.attachment records linked to each asset record."""
-        Attachment = self.env['ir.attachment']
+        """Derive count directly from the Many2many field — no extra SQL query."""
         for rec in self:
-            rec.document_count = Attachment.search_count([
-                ('res_model', '=', self._name),
-                ('res_id', '=', rec.id),
-            ])
+            rec.document_count = len(rec.attachment_ids)
 
     def action_inactivar(self):
         for record in self:
