@@ -93,7 +93,10 @@
       <field name="model">activo.intangible</field>
       <field name="arch" type="xml">
         <!-- <list>: Define una vista de tabla o lista para ver múltiples registros a la vez. -->
-        <list string="Activos Intangibles">
+        <list string="Activos Intangibles"
+              decoration-success="state == 'activo'"
+              decoration-info="state == 'inactivo'"
+              decoration-danger="state == 'expirado'">
           <field name="name"/>
           <field name="asset_type_id"/>
           <field name="registration_number"/>
