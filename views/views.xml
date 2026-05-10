@@ -69,7 +69,7 @@
                   <i class="fa fa-info-circle"/> Adjunte aquí el contrato, licencia u otro documento legal vinculado a este activo.
                 </p>
                 <button name="action_open_attachment_wizard" type="object" string="Adjuntar Archivos" class="btn-primary mb-3" icon="fa-upload"/>
-                <field name="attachment_ids" mode="kanban" nolabel="1">
+                <field name="attachment_ids" mode="kanban" nolabel="1" options="{'no_create': True}">
                     <kanban create="false" edit="false">
                         <field name="id"/>
                         <field name="mimetype"/>
@@ -77,29 +77,33 @@
                         <field name="name"/>
                         <field name="url"/>
                         <templates>
-                            <t t-name="card" class="o_kanban_attachment flex-row">
-                                <aside class="o_kanban_image m-1">
-                                    <div class="o_kanban_image_wrapper d-flex align-items-center justify-content-center">
-                                        <t t-set="webimage" t-value="new RegExp('image.*(gif|jpeg|jpg|png|webp)').test(record.mimetype.value)"/>
-                                        <div t-if="record.type.raw_value == 'url'" class="fa fa-link fa-3x text-muted" aria-label="Image is a link"/>
-                                        <img t-elif="webimage" t-attf-src="/web/image/#{record.id.raw_value}" width="100" height="100" alt="Document" class="o_attachment_image"/>
-                                        <div t-else="!webimage" class="o_image o_image_thumbnail" t-att-data-mimetype="record.mimetype.value"/>
+                            <t t-name="card" class="o_kanban_attachment flex-row p-0 overflow-hidden">
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a type="object" name="action_preview_modal" class="dropdown-item">Vista Previa</a>
+                                        <a type="delete" class="dropdown-item text-danger">Eliminar</a>
                                     </div>
+                                </div>
+                                <aside class="o_kanban_image bg-light d-flex align-items-center justify-content-center" style="width: 120px; min-width: 120px; height: 100px;">
+                                    <t t-set="webimage" t-value="new RegExp('image.*(gif|jpeg|jpg|png|webp)').test(record.mimetype.value)"/>
+                                    <div t-if="record.type.raw_value == 'url'" class="fa fa-link fa-3x text-muted"/>
+                                    <img t-elif="webimage" t-attf-src="/web/image/#{record.id.raw_value}" style="width: 100%; height: 100%; object-fit: cover;" alt="Document"/>
+                                    <div t-else="" class="o_image o_image_thumbnail" t-att-data-mimetype="record.mimetype.value"/>
                                 </aside>
-                                <main class="ms-1">
-                                    <div class="o_kanban_details_wrapper d-flex flex-column">
-                                        <field name="name" class="text-truncate fw-bold fs-5"/>
-                                        <div class="d-flex flex-grow-1 align-items-center">
-                                            <t t-if="record.type.raw_value == 'url'">
-                                                <i class="fa fa-globe" aria-label="Document url"/> <field name="url" widget="url"/>
-                                            </t>
-                                        </div>
+                                <main class="p-2 d-flex flex-column justify-content-center flex-grow-1 overflow-hidden">
+                                    <field name="name" class="text-truncate fw-bold mb-1" style="font-size: 1.1rem;"/>
+                                    <div class="text-muted small">
+                                        <t t-if="record.type.raw_value == 'url'">
+                                            <i class="fa fa-globe me-1"/> <field name="url" widget="url"/>
+                                        </t>
+                                        <t t-else="">
+                                            <field name="mimetype"/>
+                                        </t>
                                     </div>
                                 </main>
-                                <t t-name="menu">
-                                    <a type="object" name="action_preview_modal" class="dropdown-item">Vista Previa</a>
-                                    <a type="delete" class="dropdown-item">Eliminar</a>
-                                </t>
                             </t>
                         </templates>
                     </kanban>
