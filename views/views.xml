@@ -19,39 +19,65 @@
             <field name="state" widget="statusbar" statusbar_visible="activo,expirado,inactivo"/>
           </header>
           <sheet>
-            
-            <!-- <div class="oe_title">: Clase CSS estándar de Odoo para el título principal del registro. Letra grande y destacada. -->
-            <!-- Agregamos mb-4 (Margin Bottom 4) de Bootstrap para separar el título de los campos de abajo -->
+
+            <!-- =====================================================
+                 SMART BUTTON BOX — shows document count badge.
+                 Clicking opens a filtered list of ir.attachment for
+                 this specific asset record.
+                 ===================================================== -->
+            <div class="oe_button_box" name="button_box">
+              <button name="%(action_evidence_repository)s"
+                      type="action"
+                      class="oe_stat_button"
+                      icon="fa-paperclip"
+                      context="{'default_res_model': 'activo.intangible', 'default_res_id': active_id, 'search_default_res_id': active_id, 'search_default_res_model': 'activo.intangible'}">
+                <field name="document_count" widget="statinfo" string="Documentos"/>
+              </button>
+            </div>
+
+            <!-- <div class="oe_title">: Clase CSS estándar de Odoo para el título principal del registro. -->
             <div class="oe_title mb-4">
-              <!-- <label>: Texto descriptivo del campo. 'oe_edit_only' hace que la etiqueta solo se vea cuando estás editando, no cuando solo estás leyendo. -->
               <label for="name" class="oe_edit_only" string="Nombre del Activo"/>
               <h1>
                 <field name="name" placeholder="Ej. Software de Contabilidad..."/>
               </h1>
             </div>
-            
-            <!-- <group>: Organiza los campos. Un <group> dentro de otro <group> crea columnas (para aprovechar el ancho de la pantalla). -->
+
+            <!-- <group>: Organiza los campos en dos columnas. -->
             <group>
-              <!-- Agregar 'string="..."' dibuja una línea y un título para agrupar los campos visualmente. -->
               <group string="Datos Generales">
                 <field name="asset_type_id"/>
                 <field name="registration_number" placeholder="Ej. REG-12345"/>
               </group>
-              
+
               <group string="Fechas Clave">
                 <field name="concession_date"/>
                 <field name="renewal_date"/>
               </group>
             </group>
-            
-            <!-- <notebook>: Crea la sección inferior con Pestañas (Tabs) para información secundaria. -->
+
+            <!-- <notebook>: Sección inferior con pestañas. -->
             <notebook>
-              <!-- <page>: Cada pestaña dentro del notebook. -->
+              <!-- TAB 1: Información Adicional -->
               <page string="Información Adicional">
                 <group>
                   <field name="responsible_id" widget="many2one_avatar"/>
                   <field name="expense_id"/>
                 </group>
+              </page>
+
+              <!-- TAB 2: Evidencias Digitales
+                   Uses the native many2many_binary widget which renders
+                   an inline file list + upload button backed by ir.attachment.
+                   No extra Python field or DB table is required. -->
+              <page string="Evidencias Digitales" name="page_evidence">
+                <p class="text-muted" style="margin-bottom:8px;">
+                  <i class="fa fa-info-circle"/> Adjunte aquí el contrato, licencia u otro documento legal vinculado a este activo.
+                </p>
+                <field name="attachment_ids"
+                       widget="many2many_binary"
+                       string="Archivos adjuntos"
+                       nolabel="1"/>
               </page>
             </notebook>
             
@@ -76,8 +102,10 @@
           <field name="renewal_date"/>
           <field name="responsible_id" widget="many2one_avatar"/>
           <field name="expense_id"/>
-          <!-- widget="badge": Transforma el texto del estado en una etiqueta con color (decoration-info=celeste, decoration-success=verde) -->
+          <!-- widget="badge": Transforma el texto del estado en una etiqueta de color. -->
           <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-info="state == 'inactivo'" decoration-danger="state == 'expirado'"/>
+          <!-- Docs column: optional so it does not clutter narrow screens. -->
+          <field name="document_count" string="Docs." optional="show"/>
         </list>
       </field>
     </record>
