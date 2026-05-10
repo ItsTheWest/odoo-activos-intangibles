@@ -77,12 +77,14 @@ class ActivoIntangible(models.Model):
     def action_get_attachment_view(self):
         """Action to open the attachments for this specific asset from the smart button."""
         self.ensure_one()
+        tree_view_id = self.env.ref('gestion_activos_intangibles.view_attachment_custom_list').id
         return {
             'name': 'Documentos Adjuntos',
             'domain': [('res_model', '=', self._name), ('res_id', '=', self.id)],
             'res_model': 'ir.attachment',
             'type': 'ir.actions.act_window',
-            'view_mode': 'kanban,list,form',
+            'view_mode': 'list,kanban,form',
+            'views': [(tree_view_id, 'list'), (False, 'kanban'), (False, 'form')],
             'context': {
                 'default_res_model': self._name,
                 'default_res_id': self.id,
@@ -146,3 +148,19 @@ class ActivoIntangible(models.Model):
         if not expired_assets:
             _logger.info("Cron [Activos Intangibles]: No state transitions needed today.")
             return
+
+class IrAttachment(models.Model):
+    _inherit = 'ir.attachment'
+
+    def action_preview_modal(self):
+        """Abre un modal (form target='new') para previsualizar el documento actual."""
+        self.ensure_one()
+        return {
+            'name': 'Vista Previa del Documento',
+            'type': 'ir.actions.act_window',
+            'res_model': 'ir.attachment',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'view_id': self.env.ref('gestion_activos_intangibles.view_attachment_preview_form').id,
+            'target': 'new',
+        }

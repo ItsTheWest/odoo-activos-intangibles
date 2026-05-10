@@ -27,7 +27,6 @@ Long description of module's purpose
         # views.xml MUST come before evidence_views.xml because the latter
         # references search and form views defined in the former.
         'views/views.xml',
-        'views/evidence_views.xml',
         'views/statistics_views.xml',
         'views/templates.xml',
     ],

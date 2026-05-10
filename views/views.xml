@@ -224,6 +224,50 @@
         parent="menu_activo_intangible_config"
         action="action_activo_intangible_type"
         sequence="10"/>
-        
+    <!-- ========================================================= -->
+    <!-- 7. VISTAS DE PREVISUALIZACIÓN DE DOCUMENTOS (MODAL)       -->
+    <!-- ========================================================= -->
+    <!-- Vista Lista personalizada para attachments con botón de vista previa -->
+    <record id="view_attachment_custom_list" model="ir.ui.view">
+      <field name="name">ir.attachment.custom.list</field>
+      <field name="model">ir.attachment</field>
+      <field name="arch" type="xml">
+        <list string="Documentos Adjuntos">
+          <field name="name"/>
+          <field name="mimetype"/>
+          <field name="create_date" string="Fecha de Carga"/>
+          <!-- Botón de sub-opción para vista previa modal -->
+          <button name="action_preview_modal" type="object" string="Vista Previa" icon="fa-eye" class="btn-primary"/>
+        </list>
+      </field>
+    </record>
+
+    <!-- Vista de formulario modal para mostrar el archivo/imagen -->
+    <record id="view_attachment_preview_form" model="ir.ui.view">
+      <field name="name">ir.attachment.preview.form</field>
+      <field name="model">ir.attachment</field>
+      <field name="arch" type="xml">
+        <form string="Vista Previa">
+          <sheet>
+            <div class="text-center">
+              <h2 class="mb-4"><field name="name" readonly="1"/></h2>
+              <!-- Use widget="image" for images -->
+              <field name="datas" widget="image" readonly="1" invisible="mimetype not in ('image/jpeg', 'image/png', 'image/gif', 'image/webp')" style="max-width: 100%; height: auto;"/>
+              <!-- Use widget="pdf_viewer" for PDFs -->
+              <field name="datas" widget="pdf_viewer" readonly="1" invisible="mimetype != 'application/pdf'" style="width: 100%; height: 600px;"/>
+              <!-- Message if file cannot be previewed natively -->
+              <div invisible="mimetype in ('image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf')" class="alert alert-warning mt-4">
+                <strong>Atención:</strong> No hay vista previa disponible para este tipo de archivo (<field name="mimetype" readonly="1"/>).
+                Por favor, descargue el archivo.
+              </div>
+            </div>
+          </sheet>
+          <footer>
+            <button string="Cerrar" class="btn-secondary" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
   </data>
 </odoo>
