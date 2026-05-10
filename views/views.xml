@@ -69,7 +69,7 @@
                   <i class="fa fa-info-circle"/> Adjunte aquí el contrato, licencia u otro documento legal vinculado a este activo.
                 </p>
                 <button name="action_open_attachment_wizard" type="object" string="Adjuntar Archivos" class="btn-primary mb-3" icon="fa-upload"/>
-                <field name="attachment_ids" mode="kanban" nolabel="1" options="{'no_create': True}">
+                <field name="attachment_ids" mode="kanban" nolabel="1" options="{'no_create': true, 'no_quick_create': true}">
                     <kanban create="false" edit="false">
                         <field name="id"/>
                         <field name="mimetype"/>
@@ -84,7 +84,7 @@
                                     </a>
                                     <div class="dropdown-menu" role="menu">
                                         <a type="object" name="action_preview_modal" class="dropdown-item">Vista Previa</a>
-                                        <a type="delete" class="dropdown-item text-danger">Eliminar</a>
+                                        <a type="object" name="action_delete_attachment_confirm" class="dropdown-item text-danger">Eliminar</a>
                                     </div>
                                 </div>
                                 <aside class="o_kanban_image bg-light d-flex align-items-center justify-content-center" style="width: 120px; min-width: 120px; height: 100px;">
@@ -244,17 +244,23 @@
       <field name="name">ir.attachment.preview.form</field>
       <field name="model">ir.attachment</field>
       <field name="arch" type="xml">
-        <form string="Vista Previa">
+        <form string="Vista Previa" create="false" edit="false" delete="false">
           <sheet>
             <div class="text-center">
               <h2 class="mb-4"><field name="name" readonly="1"/></h2>
-              <!-- Use widget="image" for images -->
-              <field name="datas" widget="image" readonly="1" invisible="mimetype not in ('image/jpeg', 'image/png', 'image/gif', 'image/webp')" style="max-width: 100%; height: auto;"/>
-              <!-- Use widget="pdf_viewer" for PDFs -->
-              <field name="datas" widget="pdf_viewer" readonly="1" invisible="mimetype != 'application/pdf'" style="width: 100%; height: 600px;"/>
-              <!-- Message if file cannot be previewed natively -->
-              <div invisible="mimetype in ('image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf')" class="alert alert-warning mt-4">
-                <strong>Atención:</strong> No hay vista previa disponible para este tipo de archivo (<field name="mimetype" readonly="1"/>).
+              <!-- Imagen -->
+              <field name="datas" widget="image" readonly="1"
+                     invisible="mimetype not in ('image/jpeg', 'image/png', 'image/gif', 'image/webp')"
+                     style="max-width: 100%; height: auto; border-radius: 8px;"/>
+              <!-- PDF -->
+              <field name="datas" widget="pdf_viewer" readonly="1"
+                     invisible="mimetype != 'application/pdf'"
+                     style="width: 100%; height: 600px;"/>
+              <!-- Sin previsualización -->
+              <div invisible="mimetype in ('image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf')"
+                   class="alert alert-warning mt-4">
+                <strong>Atención:</strong> No hay vista previa disponible para este tipo de archivo
+                (<field name="mimetype" readonly="1"/>).
                 Por favor, descargue el archivo.
               </div>
             </div>
@@ -278,6 +284,30 @@
           </sheet>
           <footer>
             <button name="action_save_attachments" string="Guardar Evidencias" type="object" class="btn-primary" icon="fa-save"/>
+            <button string="Cancelar" class="btn-secondary" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <!-- Wizard de Confirmación: Eliminar Evidencia -->
+    <record id="view_activo_delete_attachment_wizard_form" model="ir.ui.view">
+      <field name="name">activo.delete.attachment.wizard.form</field>
+      <field name="model">activo.delete.attachment.wizard</field>
+      <field name="arch" type="xml">
+        <form string="Eliminar Evidencia">
+          <sheet>
+            <div class="o_form_view text-center py-4">
+              <span class="fa fa-exclamation-triangle fa-3x text-warning mb-3 d-block"/>
+              <h4>¿Está seguro de que desea eliminar este archivo?</h4>
+              <p class="text-muted mt-2">
+                El archivo <strong><field name="attachment_name" readonly="1" nolabel="1"/></strong>
+                será eliminado de forma permanente. Esta acción no se puede deshacer.
+              </p>
+            </div>
+          </sheet>
+          <footer>
+            <button name="action_confirm_delete" string="Sí, Eliminar" type="object" class="btn-danger" icon="fa-trash"/>
             <button string="Cancelar" class="btn-secondary" special="cancel"/>
           </footer>
         </form>

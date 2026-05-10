@@ -197,6 +197,21 @@ class IrAttachment(models.Model):
             'target': 'new',
         }
 
+    def action_delete_attachment_confirm(self):
+        """Opens a confirmation wizard before permanently deleting the attachment."""
+        self.ensure_one()
+        return {
+            'name': 'Confirmar Eliminación',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.delete.attachment.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_attachment_id': self.id,
+                'default_attachment_name': self.name,
+            },
+        }
+
 class ActivoAttachmentWizard(models.TransientModel):
     _name = 'activo.attachment.wizard'
     _description = 'Wizard para subir evidencias'
@@ -220,4 +235,19 @@ class ActivoAttachmentWizard(models.TransientModel):
                     'res_model': 'activo.intangible',
                     'res_id': self.activo_id.id,
                 })
+        return {'type': 'ir.actions.act_window_close'}
+
+
+class ActivoDeleteAttachmentWizard(models.TransientModel):
+    _name = 'activo.delete.attachment.wizard'
+    _description = 'Wizard de confirmación para eliminar evidencia'
+
+    attachment_id = fields.Many2one('ir.attachment', string="Archivo", required=True)
+    attachment_name = fields.Char(string="Nombre del archivo", readonly=True)
+
+    def action_confirm_delete(self):
+        """Permanently deletes the attachment after user confirms."""
+        self.ensure_one()
+        if self.attachment_id:
+            self.attachment_id.unlink()
         return {'type': 'ir.actions.act_window_close'}
