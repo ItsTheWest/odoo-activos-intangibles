@@ -99,17 +99,28 @@ class ActivoIntangible(models.Model):
         for rec in self:
             rec.document_count = len(rec.attachment_ids)
 
+    def write(self, vals):
+        before_attachments = self.attachment_ids
+        res = super(ActivoIntangible, self).write(vals)
+        if 'attachment_ids' in vals:
+            after_attachments = self.attachment_ids
+            removed_attachments = before_attachments - after_attachments
+            if removed_attachments:
+                removed_attachments.sudo().unlink()
+        return res
+
     def action_get_attachment_view(self):
         """Action to open the attachments for this specific asset from the smart button."""
         self.ensure_one()
         tree_view_id = self.env.ref('gestion_activos_intangibles.view_attachment_custom_list').id
+        kanban_view_id = self.env.ref('gestion_activos_intangibles.view_attachment_custom_kanban').id
         return {
             'name': 'Documentos Adjuntos',
             'domain': [('res_model', '=', self._name), ('res_id', '=', self.id)],
             'res_model': 'ir.attachment',
             'type': 'ir.actions.act_window',
-            'view_mode': 'list,kanban,form',
-            'views': [(tree_view_id, 'list'), (False, 'kanban'), (False, 'form')],
+            'view_mode': 'kanban,list,form',
+            'views': [(kanban_view_id, 'kanban'), (tree_view_id, 'list'), (False, 'form')],
             'context': {
                 'default_res_model': self._name,
                 'default_res_id': self.id,

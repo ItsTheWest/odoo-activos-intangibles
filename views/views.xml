@@ -178,6 +178,19 @@
     <!-- ========================================================= -->
     <!-- 7. VISTAS DE PREVISUALIZACIÓN DE DOCUMENTOS (MODAL)       -->
     <!-- ========================================================= -->
+    <!-- Vista Kanban personalizada para attachments con botón de vista previa heredada -->
+    <record id="view_attachment_custom_kanban" model="ir.ui.view">
+      <field name="name">ir.attachment.custom.kanban</field>
+      <field name="model">ir.attachment</field>
+      <field name="inherit_id" ref="mail.view_document_file_kanban"/>
+      <field name="mode">primary</field>
+      <field name="arch" type="xml">
+        <xpath expr="//t[@t-name='menu']" position="inside">
+            <a type="object" name="action_preview_modal" class="dropdown-item">Vista Previa</a>
+        </xpath>
+      </field>
+    </record>
+
     <!-- Vista Lista personalizada para attachments con botón de vista previa -->
     <record id="view_attachment_custom_list" model="ir.ui.view">
       <field name="name">ir.attachment.custom.list</field>
