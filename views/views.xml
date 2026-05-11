@@ -11,14 +11,25 @@
       <field name="arch" type="xml">   <!-- <field name="arch" type="xml">: Aquí dentro va la arquitectura visual de la vista en código XML. -->
         <form string="Activo Intangible">
           <!-- <header>: Es la barra gris superior. Se usa para botones de acción y la barra de estado (workflow). -->
-          <header>
+            <!-- ========================================================= -->
+            <!-- 1.1 CABECERA (HEADER): Botones de acción y barra de estado -->
+            <!-- ========================================================= -->
+            <header>
             <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state != 'activo'"/>
             <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state not in ('inactivo', 'expirado')" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
             
             <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
             <field name="state" widget="statusbar" statusbar_visible="activo,expirado,inactivo"/>
           </header>
+          <!-- ========================================================= -->
+          <!-- 1.2 CUERPO (SHEET): Contenido principal del formulario    -->
+          <!-- ========================================================= -->
           <sheet>
+            <style>
+                .hide_add_button .o_kanban_record_add {
+                    display: none !important;
+                }
+            </style>
 
             <!-- =====================================================
                  SMART BUTTON BOX — shows document count badge.
@@ -30,6 +41,7 @@
             </div>
 
             <!-- <div class="oe_title">: Clase CSS estándar de Odoo para el título principal del registro. -->
+            <!-- TÍTULO: Nombre del activo editable solo en modo edición -->
             <div class="oe_title mb-4">
               <label for="name" class="oe_edit_only" string="Nombre del Activo"/>
               <h1>
@@ -38,6 +50,7 @@
             </div>
 
             <!-- <group>: Organiza los campos en dos columnas. -->
+            <!-- CONTENEDOR DE GRUPOS: Organiza los campos principales en columnas -->
             <group>
               <group string="Datos Generales">
                 <field name="asset_type_id"/>
@@ -51,6 +64,7 @@
             </group>
 
             <!-- <notebook>: Sección inferior con pestañas. -->
+            <!-- PANELES DE PESTAÑAS (NOTEBOOK): Información complementaria -->
             <notebook>
               <!-- TAB 1: Información Adicional -->
               <page string="Información Adicional">
@@ -65,12 +79,11 @@
                    an inline file list + upload button backed by ir.attachment.
                    No extra Python field or DB table is required. -->
               <page string="Evidencias Digitales" name="page_evidence">
-                <p class="text-muted" style="margin-bottom:8px;">
-                  <i class="fa fa-info-circle"/> Adjunte aquí el contrato, licencia u otro documento legal vinculado a este activo.
-                </p>
+                <!-- BOTÓN DE ACCIÓN: Abre el wizard para cargar documentos -->
                 <button name="action_open_attachment_wizard" type="object" string="Adjuntar Archivos" class="btn-primary mb-3" icon="fa-upload"/>
-                <field name="attachment_ids" mode="kanban" nolabel="1" options="{'no_create': true, 'no_quick_create': true}">
-                    <kanban create="false" edit="false">
+                <!-- LISTADO DE EVIDENCIAS: Vista Kanban integrada de archivos adjuntos -->
+                <field name="attachment_ids" mode="kanban" nolabel="1" class="hide_add_button" options="{'no_create': True, 'no_edit': True, 'no_open': True}">
+                    <kanban create="0" edit="0" delete="0" link="0">
                         <field name="id"/>
                         <field name="mimetype"/>
                         <field name="type"/>
@@ -123,7 +136,7 @@
       <field name="name">activo.intangible.list</field>
       <field name="model">activo.intangible</field>
       <field name="arch" type="xml">
-        <!-- <list>: Define una vista de tabla o lista para ver múltiples registros a la vez. -->
+        <!-- VISTA DE TABLA: Configuración de colores y columnas para el listado principal -->
         <list string="Activos Intangibles"
               decoration-success="state == 'activo'"
               decoration-info="state == 'inactivo'"
@@ -150,6 +163,7 @@
       <field name="name">activo.intangible.search</field>
       <field name="model">activo.intangible</field>
       <field name="arch" type="xml">
+        <!-- VISTA DE BÚSQUEDA: Definición de filtros rápidos y agrupamientos -->
         <search string="Buscar Activos Intangibles">
           <field name="name"/>
           <field name="responsible_id"/>
@@ -174,7 +188,7 @@
     <record id="action_activo_intangible" model="ir.actions.act_window">
       <field name="name">Activos Intangibles</field>
       <field name="res_model">activo.intangible</field>
-      <!-- <view_mode>: Define qué vistas se pueden abrir y en qué orden (primero la lista, luego el formulario). -->
+      <!-- ACCIÓN PRINCIPAL: Define el comportamiento al abrir el módulo (orden de vistas y mensaje de ayuda) -->
       <field name="view_mode">list,form</field>
       <field name="search_view_id" ref="view_activo_intangible_search"/>
       <!-- <help>: El mensaje que aparece cuando no hay ningún registro creado (pantalla vacía). -->
@@ -189,11 +203,12 @@
     <!-- 5. MENÚS (MENUITEMS)                                      -->
     <!-- ========================================================= -->
     <!-- <menuitem>: Los botones de navegación en la barra superior o lateral. -->
+    <!-- MENÚ PRINCIPAL: Nodo raíz del módulo -->
     <menuitem id="menu_activo_intangible_root" 
             name="Activos Intangibles" 
             sequence="10"/>
             
-    <!-- Menú hijo que ejecuta la acción definida arriba. -->
+    <!-- SUBMENÚ ACTIVOS: Enlace directo a la gestión de registros -->
     <menuitem id="menu_activo_intangible" 
         name="Activos" 
         action="action_activo_intangible" 
@@ -216,6 +231,7 @@
       <field name="inherit_id" ref="mail.view_document_file_kanban"/>
       <field name="mode">primary</field>
       <field name="arch" type="xml">
+        <!-- KANBAN HEREDADO: Añade botón de vista previa al menú de cada archivo -->
         <xpath expr="//t[@t-name='menu']" position="inside">
             <a type="object" name="action_preview_modal" class="dropdown-item">Vista Previa</a>
             <a type="delete" class="dropdown-item">Eliminar</a>
@@ -277,6 +293,7 @@
       <field name="name">activo.attachment.wizard.form</field>
       <field name="model">activo.attachment.wizard</field>
       <field name="arch" type="xml">
+        <!-- WIZARD CARGA: Interfaz para subir múltiples archivos simultáneamente -->
         <form string="Adjuntar Archivos">
           <sheet>
              <p class="text-muted">Seleccione los documentos digitales que desea vincular a este activo.</p>
@@ -295,6 +312,7 @@
       <field name="name">activo.delete.attachment.wizard.form</field>
       <field name="model">activo.delete.attachment.wizard</field>
       <field name="arch" type="xml">
+        <!-- WIZARD ELIMINACIÓN: Modal de confirmación para borrado permanente -->
         <form string="Eliminar Evidencia">
           <sheet>
             <div class="o_form_view text-center py-4">
