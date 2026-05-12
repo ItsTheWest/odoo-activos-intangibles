@@ -142,15 +142,11 @@
                 <!-- CHART 1: Distribución por Estado -->
                 <div class="col-12 col-lg-6 mb-4">
                   <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-2">
+                    <div class="card-header bg-white border-bottom py-2">
                       <span class="fw-semibold">
                         <i class="fa fa-bar-chart me-2 text-primary"/>
                         Distribución por Estado
                       </span>
-                      <button name="action_ver_grafico" type="object"
-                              class="btn btn-sm btn-outline-primary">
-                        <i class="fa fa-external-link me-1"/> Ver completo
-                      </button>
                     </div>
                     <div class="card-body p-3">
                       <field name="graph_estado_svg" widget="html" nolabel="1"/>
