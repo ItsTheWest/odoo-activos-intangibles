@@ -29,6 +29,7 @@ Long description of module's purpose
         'views/views.xml',
         'views/activo_intangible_type_views.xml',
         'views/statistics_views.xml',
+        'views/calendar_views.xml',
     ],
     # only loaded in demonstration mode
     'demo': [
