@@ -87,6 +87,18 @@ class ActivoIntangible(models.Model):
     responsible_id = fields.Many2one('hr.employee', string="responsable")
     expense_id = fields.Many2one('hr.expense', string="gastos")
 
+    valor_contable = fields.Monetary(
+        string="Valor Contable",
+        currency_field='currency_id',
+        tracking=True,
+        help="Valor contable actual del activo intangible (para reportes financieros).",
+    )
+    currency_id = fields.Many2one(
+        'res.currency',
+        string="Moneda",
+        default=lambda self: self.env.company.currency_id,
+    )
+
     # ---------------------------------------------------------------
     # DIGITAL EVIDENCE — explicit Many2many to ir.attachment
     #
