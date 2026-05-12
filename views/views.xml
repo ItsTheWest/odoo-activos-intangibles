@@ -15,11 +15,11 @@
             <!-- 1.1 CABECERA (HEADER): Botones de acción y barra de estado -->
             <!-- ========================================================= -->
             <header>
-            <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state != 'activo'"/>
-            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state not in ('inactivo', 'expirado')" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
+            <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state not in ('activo', 'por_expirar')"/>
+            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state not in ('inactivo', 'expirado', 'por_expirar')" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
             
             <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
-            <field name="state" widget="statusbar" statusbar_visible="activo,expirado,inactivo"/>
+            <field name="state" widget="statusbar" statusbar_visible="activo,por_expirar,expirado,inactivo"/>
           </header>
           <!-- ========================================================= -->
           <!-- 1.2 CUERPO (SHEET): Contenido principal del formulario    -->
@@ -139,6 +139,7 @@
         <!-- VISTA DE TABLA: Configuración de colores y columnas para el listado principal -->
         <list string="Activos Intangibles"
               decoration-success="state == 'activo'"
+              decoration-warning="state == 'por_expirar'"
               decoration-info="state == 'inactivo'"
               decoration-danger="state == 'expirado'">
           <field name="name"/>
@@ -149,7 +150,7 @@
           <field name="responsible_id" widget="many2one_avatar"/>
           <field name="expense_id"/>
           <!-- widget="badge": Transforma el texto del estado en una etiqueta de color. -->
-          <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-info="state == 'inactivo'" decoration-danger="state == 'expirado'"/>
+          <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-warning="state == 'por_expirar'" decoration-info="state == 'inactivo'" decoration-danger="state == 'expirado'"/>
           <!-- Docs column: optional so it does not clutter narrow screens. -->
           <field name="document_count" string="Docs." optional="show"/>
         </list>
@@ -169,6 +170,7 @@
           <field name="responsible_id"/>
 
           <filter string="Activos" name="filter_activo" domain="[('state', '=', 'activo')]"/>
+          <filter string="Por Expirar" name="filter_por_expirar" domain="[('state', '=', 'por_expirar')]"/>
           <filter string="Expirados" name="filter_expirado" domain="[('state', '=', 'expirado')]"/>
 
           <group>
@@ -189,7 +191,7 @@
       <field name="name">Activos Intangibles</field>
       <field name="res_model">activo.intangible</field>
       <!-- ACCIÓN PRINCIPAL: Define el comportamiento al abrir el módulo (orden de vistas y mensaje de ayuda) -->
-      <field name="view_mode">list,form</field>
+      <field name="view_mode">list,calendar,form</field>
       <field name="search_view_id" ref="view_activo_intangible_search"/>
       <!-- <help>: El mensaje que aparece cuando no hay ningún registro creado (pantalla vacía). -->
       <field name="help" type="html">
