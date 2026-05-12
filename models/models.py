@@ -59,6 +59,7 @@ class ActivoIntangible(models.Model):
 
     state = fields.Selection([
         ('activo', 'Activo'),
+        ('por_expirar', 'Por Expirar'),
         ('inactivo', 'Inactivo'),
         ('expirado', 'Expirado')
     ], string="Estado", default="activo", tracking=True)
@@ -133,7 +134,14 @@ class ActivoIntangible(models.Model):
                 raise UserError("Error: No se puede activar el activo sin una Fecha de Renovación.")
             if not record.attachment_ids:
                 raise UserError("Error: No se puede activar el activo sin adjuntar al menos un documento de evidencia (contrato o licencia).")
-            record.state = 'activo'
+            
+            today = fields.Date.today()
+            if record.renewal_date < today:
+                record.state = 'expirado'
+            elif record.renewal_date <= today + timedelta(days=60):
+                record.state = 'por_expirar'
+            else:
+                record.state = 'activo'
 
     @api.constrains('concession_date', 'renewal_date')
     def _check_dates(self):
@@ -164,20 +172,33 @@ class ActivoIntangible(models.Model):
         """
         Scheduled action (cron) that runs nightly.
         1. Marks assets as 'expirado' if their renewal date has passed.
+        2. Marks assets as 'por_expirar' if their renewal date is <= 60 days.
         """
         today = fields.Date.today()
+        sixty_days = today + timedelta(days=60)
         
         # 1. PROCESS EXPIRED ASSETS
-        # Find assets that are still active but their date has already passed.
+        # Find assets that are still active or por_expirar but their date has already passed.
         expired_assets = self.search([
-            ('state', '=', 'activo'),
+            ('state', 'in', ['activo', 'por_expirar']),
             ('renewal_date', '<', today),
         ])
         for asset in expired_assets:
             asset.state = 'expirado'
             _logger.info("Cron [Activos Intangibles]: Asset '%s' (ID: %s) marked as EXPIRED.", asset.name, asset.id)
 
-        if not expired_assets:
+        # 2. PROCESS EXPIRING ASSETS
+        # Find assets that are active and their date is <= 60 days from today.
+        expiring_assets = self.search([
+            ('state', '=', 'activo'),
+            ('renewal_date', '>=', today),
+            ('renewal_date', '<=', sixty_days),
+        ])
+        for asset in expiring_assets:
+            asset.state = 'por_expirar'
+            _logger.info("Cron [Activos Intangibles]: Asset '%s' (ID: %s) marked as POR EXPIRAR.", asset.name, asset.id)
+
+        if not expired_assets and not expiring_assets:
             _logger.info("Cron [Activos Intangibles]: No state transitions needed today.")
             return
 
