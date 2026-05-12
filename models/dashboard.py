@@ -223,9 +223,9 @@ class ActivoIntangibleDashboard(models.TransientModel):
         # Count expirations per month
         counts = [0] * 6
         for a in activos:
-            if a.fecha_vencimiento:
+            if a.renewal_date:
                 # Simple check if date is in next 6 months
-                v_date = fields.Date.from_string(a.fecha_vencimiento)
+                v_date = fields.Date.from_string(a.renewal_date)
                 if today.date() <= v_date:
                     diff_months = (v_date.year - today.year) * 12 + v_date.month - today.month
                     if 0 <= diff_months < 6:
