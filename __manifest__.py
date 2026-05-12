@@ -28,6 +28,7 @@ Long description of module's purpose
         # references search and form views defined in the former.
         'views/views.xml',
         'views/activo_intangible_type_views.xml',
+        'views/dashboard_views.xml',
         'views/statistics_views.xml',
         'views/calendar_views.xml',
     ],

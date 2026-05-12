@@ -64,7 +64,7 @@
     <menuitem
       id="menu_activo_intangible_statistics"
       name="Estadísticas"
-      action="action_activo_intangible_statistics"
+      action="gestion_activos_intangibles.action_activo_intangible_dashboard"
       parent="menu_activo_intangible_root"
       sequence="20"/>
 

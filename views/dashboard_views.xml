@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- ================================================================= -->
+    <!-- 1. DASHBOARD FORM VIEW                                              -->
+    <!--    KPI containers displayed ABOVE the statistics navigation.        -->
+    <!--    Uses a TransientModel (activo.intangible.dashboard) to hold      -->
+    <!--    the computed global metrics.                                      -->
+    <!-- ================================================================= -->
+    <record id="view_activo_intangible_dashboard_form" model="ir.ui.view">
+      <field name="name">activo.intangible.dashboard.form</field>
+      <field name="model">activo.intangible.dashboard</field>
+      <field name="arch" type="xml">
+        <form string="Panel de Estadísticas" create="false" delete="false">
+
+          <!-- ─── HEADER: title only, no status bar needed ─── -->
+          <div class="o_form_view">
+
+            <!-- ── KPI CARDS ROW ── -->
+            <div class="container-fluid mt-3 mb-3">
+
+              <!-- Row 1: Financial -->
+              <div class="row mb-3">
+                <!-- Valoración Total -->
+                <div class="col-12 col-md-4 mb-2">
+                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1a6b3c 0%, #2d9b5e 100%);">
+                    <div class="card-body text-white">
+                      <div class="d-flex align-items-center mb-1">
+                        <i class="fa fa-dollar-sign fa-2x me-2 opacity-75"/>
+                        <span class="text-uppercase small fw-bold opacity-75">Valoración Total</span>
+                      </div>
+                      <h3 class="card-title fw-bold mb-0">
+                        <field name="valoracion_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                      </h3>
+                      <p class="card-text small opacity-75 mt-1">Valor contable total de todos los activos</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Total Activos -->
+                <div class="col-12 col-md-4 mb-2">
+                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1155cc 0%, #3a7bd5 100%);">
+                    <div class="card-body text-white">
+                      <div class="d-flex align-items-center mb-1">
+                        <i class="fa fa-archive fa-2x me-2 opacity-75"/>
+                        <span class="text-uppercase small fw-bold opacity-75">Total Registrados</span>
+                      </div>
+                      <h3 class="card-title fw-bold mb-0">
+                        <field name="total_activos"/>
+                      </h3>
+                      <p class="card-text small opacity-75 mt-1">Activos intangibles en el sistema</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Activos Activos -->
+                <div class="col-12 col-md-4 mb-2">
+                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #145a32 0%, #27ae60 100%);">
+                    <div class="card-body text-white">
+                      <div class="d-flex align-items-center mb-1">
+                        <i class="fa fa-check-circle fa-2x me-2 opacity-75"/>
+                        <span class="text-uppercase small fw-bold opacity-75">Activos</span>
+                      </div>
+                      <h3 class="card-title fw-bold mb-0">
+                        <field name="activos_activos"/>
+                      </h3>
+                      <p class="card-text small opacity-75 mt-1">En estado Activo y vigentes</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Row 2: Alerts -->
+              <div class="row mb-3">
+                <!-- Por Expirar -->
+                <div class="col-12 col-md-4 mb-2">
+                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #9c5700 0%, #e67e22 100%);">
+                    <div class="card-body text-white">
+                      <div class="d-flex align-items-center mb-1">
+                        <i class="fa fa-exclamation-triangle fa-2x me-2 opacity-75"/>
+                        <span class="text-uppercase small fw-bold opacity-75">Por Expirar</span>
+                      </div>
+                      <h3 class="card-title fw-bold mb-0">
+                        <field name="activos_por_expirar"/>
+                      </h3>
+                      <p class="card-text small opacity-75 mt-1">Vencen en los próximos 60 días</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Expirados -->
+                <div class="col-12 col-md-4 mb-2">
+                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #7b1a1a 0%, #c0392b 100%);">
+                    <div class="card-body text-white">
+                      <div class="d-flex align-items-center mb-1">
+                        <i class="fa fa-times-circle fa-2x me-2 opacity-75"/>
+                        <span class="text-uppercase small fw-bold opacity-75">Expirados</span>
+                      </div>
+                      <h3 class="card-title fw-bold mb-0">
+                        <field name="activos_expirados"/>
+                      </h3>
+                      <p class="card-text small opacity-75 mt-1">Requieren renovación urgente</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Inactivos -->
+                <div class="col-12 col-md-4 mb-2">
+                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1a3a5c 0%, #2980b9 100%);">
+                    <div class="card-body text-white">
+                      <div class="d-flex align-items-center mb-1">
+                        <i class="fa fa-pause-circle fa-2x me-2 opacity-75"/>
+                        <span class="text-uppercase small fw-bold opacity-75">Inactivos</span>
+                      </div>
+                      <h3 class="card-title fw-bold mb-0">
+                        <field name="activos_inactivos"/>
+                      </h3>
+                      <p class="card-text small opacity-75 mt-1">Activos desactivados temporalmente</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div><!-- /container-fluid -->
+
+            <!-- Hidden field needed for monetary widget -->
+            <field name="currency_id" invisible="1"/>
+
+            <!-- ── NAVIGATION BUTTONS TO DETAILED VIEWS ── -->
+            <div class="container-fluid mt-2 mb-4">
+              <div class="row">
+                <div class="col-12">
+                  <h5 class="fw-bold text-muted mb-3">
+                    <i class="fa fa-chart-bar me-2"/>
+                    Análisis Detallado
+                  </h5>
+                </div>
+                <div class="col-12 col-md-6 mb-2">
+                  <button name="action_ver_grafico" type="object"
+                          class="btn btn-primary btn-lg w-100">
+                    <i class="fa fa-bar-chart me-2"/>
+                    Ver Gráfico por Tipo y Estado
+                  </button>
+                </div>
+                <div class="col-12 col-md-6 mb-2">
+                  <button name="action_ver_pivot" type="object"
+                          class="btn btn-secondary btn-lg w-100">
+                    <i class="fa fa-table me-2"/>
+                    Ver Tabla Pivot / Exportar Excel
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /o_form_view -->
+        </form>
+      </field>
+    </record>
+
+    <!-- ================================================================= -->
+    <!-- 2. ACTION: Opens a new Dashboard record automatically              -->
+    <!-- ================================================================= -->
+    <record id="action_activo_intangible_dashboard" model="ir.actions.act_window">
+      <field name="name">Estadísticas de Activos</field>
+      <field name="res_model">activo.intangible.dashboard</field>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="view_activo_intangible_dashboard_form"/>
+      <field name="target">current</field>
+      <!-- Auto-create one dashboard record each time the menu is clicked -->
+      <field name="context">{'create': True}</field>
+    </record>
+
+  </data>
+</odoo>
