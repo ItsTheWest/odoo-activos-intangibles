@@ -9,9 +9,11 @@
             <field name="model">activo.intangible</field>
             <field name="arch" type="xml">
                 <calendar string="Calendario de Vencimientos" date_start="renewal_date" color="state" mode="month">
-                    <field name="name"/>
-                    <field name="asset_type_id"/>
-                    <field name="state"/>
+                    <field name="name" string="Activo"/>
+                    <field name="renewal_date" string="Fecha de Vencimiento"/>
+                    <field name="asset_type_id" string="Tipo de Activo"/>
+                    <field name="responsible_id" widget="many2one_avatar_user"/>
+                    <field name="state" invisible="1"/>
                 </calendar>
             </field>
         </record>
