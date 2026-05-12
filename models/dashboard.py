@@ -53,6 +53,17 @@ class ActivoIntangibleDashboard(models.TransientModel):
         default=lambda self: self.env.company.currency_id,
         readonly=True,
     )
+    # Holds all asset records so graph widgets can render inline inside the
+    # dashboard form, displaying multiple chart types without leaving the page.
+    activos_ids = fields.Many2many(
+        comodel_name='activo.intangible',
+        relation='activo_intangible_dashboard_rel',   # explicit table — no ORM collision
+        column1='dashboard_id',
+        column2='activo_id',
+        string="Activos (Gráficos)",
+        default=lambda self: self.env['activo.intangible'].search([]),
+        readonly=True,
+    )
 
     # -----------------------------------------------------------------------
     # Private helpers — called once during default computation
@@ -69,19 +80,33 @@ class ActivoIntangibleDashboard(models.TransientModel):
         return sum(activos.mapped('valor_contable'))
 
     # -----------------------------------------------------------------------
-    # Navigation actions — open the detailed Graph / Pivot views
+    # Navigation actions — open full-page views for deep-dive analysis
     # -----------------------------------------------------------------------
 
     def action_ver_grafico(self):
+        """Opens full-page bar chart grouped by state."""
         return {
-            'name': 'Estadísticas — Gráfico',
+            'name': 'Estadísticas — Gráfico por Estado',
             'type': 'ir.actions.act_window',
             'res_model': 'activo.intangible',
             'view_mode': 'graph,pivot',
+            'context': {'graph_groupbys': ['state'], 'graph_mode': 'bar'},
+            'target': 'current',
+        }
+
+    def action_ver_grafico_tipo(self):
+        """Opens full-page pie chart grouped by asset type."""
+        return {
+            'name': 'Estadísticas — Gráfico por Tipo',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible',
+            'view_mode': 'graph,pivot',
+            'context': {'graph_groupbys': ['asset_type_id'], 'graph_mode': 'pie'},
             'target': 'current',
         }
 
     def action_ver_pivot(self):
+        """Opens full-page pivot table for Excel export."""
         return {
             'name': 'Estadísticas — Tabla Pivot',
             'type': 'ir.actions.act_window',
