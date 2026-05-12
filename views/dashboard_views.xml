@@ -3,51 +3,8 @@
   <data>
 
     <!-- ================================================================= -->
-    <!-- 1. GRAPH VIEW — Bar chart: count of assets grouped by STATE        -->
-    <!-- ================================================================= -->
-    <record id="view_activo_intangible_graph_by_state" model="ir.ui.view">
-      <field name="name">activo.intangible.graph.by_state</field>
-      <field name="model">activo.intangible</field>
-      <field name="arch" type="xml">
-        <graph string="Activos por Estado" type="bar" sample="1">
-          <field name="state" type="row"/>
-        </graph>
-      </field>
-    </record>
-
-    <!-- ================================================================= -->
-    <!-- 2. GRAPH VIEW — Pie chart: count of assets grouped by TYPE         -->
-    <!-- ================================================================= -->
-    <record id="view_activo_intangible_graph_by_type" model="ir.ui.view">
-      <field name="name">activo.intangible.graph.by_type</field>
-      <field name="model">activo.intangible</field>
-      <!-- Lower priority so this is not picked as the default graph view  -->
-      <field name="priority">20</field>
-      <field name="arch" type="xml">
-        <graph string="Activos por Tipo" type="pie" sample="1">
-          <field name="asset_type_id" type="row"/>
-        </graph>
-      </field>
-    </record>
-
-    <!-- ================================================================= -->
-    <!-- 3. GRAPH VIEW — Line chart: assets by renewal month                -->
-    <!-- ================================================================= -->
-    <record id="view_activo_intangible_graph_by_month" model="ir.ui.view">
-      <field name="name">activo.intangible.graph.by_month</field>
-      <field name="model">activo.intangible</field>
-      <field name="priority">30</field>
-      <field name="arch" type="xml">
-        <graph string="Vencimientos por Mes" type="line" sample="1">
-          <field name="renewal_date" type="row" interval="month"/>
-        </graph>
-      </field>
-    </record>
-
-    <!-- ================================================================= -->
-    <!-- 4. DASHBOARD FORM VIEW                                             -->
-    <!--    KPI containers above + embedded graph sections below.           -->
-    <!--    Uses activos_ids Many2many to render graphs inline.             -->
+    <!-- DASHBOARD FORM VIEW                                             -->
+    <!-- KPI containers above + embedded high-performance SVG charts below.-->
     <!-- ================================================================= -->
     <record id="view_activo_intangible_dashboard_form" model="ir.ui.view">
       <field name="name">activo.intangible.dashboard.form</field>
@@ -164,12 +121,10 @@
 
             </div><!-- /container-fluid KPIs -->
 
-            <!-- Hidden field needed for monetary widget -->
             <field name="currency_id" invisible="1"/>
 
             <!-- ================================================================= -->
-            <!-- ── ANÁLISIS DETALLADO: GRAPHS EMBEDDED BELOW THE KPI CARDS ──    -->
-            <!-- Each chart uses activos_ids + context to set groupby / mode.      -->
+            <!-- ANÁLISIS DETALLADO: DYNAMIC SVG CHARTS                           -->
             <!-- ================================================================= -->
             <div class="container-fluid mb-4">
 
@@ -183,10 +138,10 @@
                 </div>
               </div>
 
-              <!-- ── CHART 1: Bar — Distribution by State ── -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <div class="card border-0 shadow-sm">
+              <div class="row">
+                <!-- CHART 1: Distribución por Estado -->
+                <div class="col-12 col-lg-6 mb-4">
+                  <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-2">
                       <span class="fw-semibold">
                         <i class="fa fa-bar-chart me-2 text-primary"/>
@@ -197,28 +152,15 @@
                         <i class="fa fa-external-link me-1"/> Ver completo
                       </button>
                     </div>
-                    <div class="card-body p-2">
-                      <!--
-                        Render activos_ids as a graph widget.
-                        context sets the groupby (state) and chart type (bar).
-                        The view_ref points to our dedicated bar-chart graph view.
-                      -->
-                      <field name="activos_ids"
-                             nolabel="1"
-                             widget="many2many"
-                             mode="graph"
-                             options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"
-                             context="{'graph_groupbys': ['state'], 'graph_mode': 'bar'}"
-                             view_ref="gestion_activos_intangibles.view_activo_intangible_graph_by_state"/>
+                    <div class="card-body p-3">
+                      <field name="graph_estado_svg" widget="html" nolabel="1"/>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <!-- ── CHART 2: Pie — Composition by Asset Type ── -->
-              <div class="row mb-4">
-                <div class="col-12">
-                  <div class="card border-0 shadow-sm">
+                <!-- CHART 2: Composición por Tipo -->
+                <div class="col-12 col-lg-6 mb-4">
+                  <div class="card border-0 shadow-sm h-100">
                     <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-2">
                       <span class="fw-semibold">
                         <i class="fa fa-pie-chart me-2 text-success"/>
@@ -229,41 +171,29 @@
                         <i class="fa fa-external-link me-1"/> Ver completo
                       </button>
                     </div>
-                    <div class="card-body p-2">
-                      <field name="activos_ids"
-                             nolabel="1"
-                             widget="many2many"
-                             mode="graph"
-                             options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"
-                             context="{'graph_groupbys': ['asset_type_id'], 'graph_mode': 'pie'}"
-                             view_ref="gestion_activos_intangibles.view_activo_intangible_graph_by_type"/>
+                    <div class="card-body p-3">
+                      <field name="graph_tipo_svg" widget="html" nolabel="1"/>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <!-- ── CHART 3: Line — Expiration timeline by Month ── -->
+              <!-- CHART 3: Línea de Tiempo / Información Adicional -->
               <div class="row mb-4">
                 <div class="col-12">
                   <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-2">
                       <span class="fw-semibold">
-                        <i class="fa fa-line-chart me-2 text-warning"/>
-                        Línea de Tiempo de Vencimientos
+                        <i class="fa fa-info-circle me-2 text-info"/>
+                        Estado General del Repositorio
                       </span>
                       <button name="action_ver_pivot" type="object"
-                              class="btn btn-sm btn-outline-warning">
-                        <i class="fa fa-table me-1"/> Pivot / Excel
+                              class="btn btn-sm btn-outline-info">
+                        <i class="fa fa-table me-1"/> Explorar Datos
                       </button>
                     </div>
-                    <div class="card-body p-2">
-                      <field name="activos_ids"
-                             nolabel="1"
-                             widget="many2many"
-                             mode="graph"
-                             options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"
-                             context="{'graph_groupbys': ['renewal_date:month'], 'graph_mode': 'line'}"
-                             view_ref="gestion_activos_intangibles.view_activo_intangible_graph_by_month"/>
+                    <div class="card-body p-0">
+                      <field name="graph_vencimientos_svg" widget="html" nolabel="1"/>
                     </div>
                   </div>
                 </div>
@@ -276,16 +206,13 @@
       </field>
     </record>
 
-    <!-- ================================================================= -->
-    <!-- 5. ACTION: Opens a new Dashboard record automatically              -->
-    <!-- ================================================================= -->
+    <!-- ACTION -->
     <record id="action_activo_intangible_dashboard" model="ir.actions.act_window">
       <field name="name">Estadísticas de Activos</field>
       <field name="res_model">activo.intangible.dashboard</field>
       <field name="view_mode">form</field>
       <field name="view_id" ref="view_activo_intangible_dashboard_form"/>
       <field name="target">current</field>
-      <!-- Auto-create one dashboard record each time the menu is clicked -->
       <field name="context">{'create': True}</field>
     </record>
 
