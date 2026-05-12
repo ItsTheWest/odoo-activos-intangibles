@@ -1,0 +1,35 @@
+/* Custom stronger colors for Intangible Assets Calendar */
+
+/* Red - Expirado (Index 1) */
+.o_calendar_view .o_calendar_color_1 {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+    color: white !important;
+}
+
+/* Orange - Por Expirar (Index 2) */
+.o_calendar_view .o_calendar_color_2 {
+    background-color: #fd7e14 !important;
+    border-color: #fd7e14 !important;
+    color: white !important;
+}
+
+/* Blue - Inactivo (Index 4) */
+.o_calendar_view .o_calendar_color_4 {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+    color: white !important;
+}
+
+/* Green - Activo (Index 10) */
+.o_calendar_view .o_calendar_color_10 {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+    color: white !important;
+}
+
+/* Optional: Make the sidebar filters match these stronger colors */
+.o_calendar_sidebar .o_calendar_color_1 { color: #dc3545 !important; }
+.o_calendar_sidebar .o_calendar_color_2 { color: #fd7e14 !important; }
+.o_calendar_sidebar .o_calendar_color_4 { color: #0d6efd !important; }
+.o_calendar_sidebar .o_calendar_color_10 { color: #198754 !important; }

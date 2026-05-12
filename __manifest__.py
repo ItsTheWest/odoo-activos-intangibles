@@ -35,4 +35,9 @@ Long description of module's purpose
     'demo': [
         'demo/demo.xml',
     ],
+    'assets': {
+        'web.assets_backend': [
+            'gestion_activos_intangibles/static/src/css/calendar_custom.css',
+        ],
+    },
 }
