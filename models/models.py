@@ -58,11 +58,31 @@ class ActivoIntangible(models.Model):
     renewal_date = fields.Date(string="fecha de renovacion/caducidad", tracking=True)
 
     state = fields.Selection([
+        ('inactivo', 'Inactivo'),
         ('activo', 'Activo'),
         ('por_expirar', 'Por Expirar'),
-        ('inactivo', 'Inactivo'),
-        ('expirado', 'Expirado')
-    ], string="Estado", default="activo", tracking=True)
+        ('expirado', 'Expirado'),
+    ], string='Estado', default='activo', required=True, tracking=True)
+
+    calendar_color = fields.Integer(
+        string='Color en Calendario',
+        compute='_compute_calendar_color',
+        store=True,
+    )
+
+    @api.depends('state')
+    def _compute_calendar_color(self):
+        for record in self:
+            if record.state == 'activo':
+                record.calendar_color = 10  # Green
+            elif record.state == 'expirado':
+                record.calendar_color = 1   # Red
+            elif record.state == 'inactivo':
+                record.calendar_color = 4   # Light Blue / Blue
+            elif record.state == 'por_expirar':
+                record.calendar_color = 2   # Orange
+            else:
+                record.calendar_color = 0   # Default
 
     responsible_id = fields.Many2one('hr.employee', string="responsable")
     expense_id = fields.Many2one('hr.expense', string="gastos")
