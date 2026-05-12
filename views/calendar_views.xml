@@ -15,5 +15,21 @@
                 </calendar>
             </field>
         </record>
+
+
+        <!-- Acción de ventana específica para el calendario -->
+        <record id="action_activo_intangible_calendar" model="ir.actions.act_window">
+            <field name="name">Calendario de Vencimientos</field>
+            <field name="res_model">activo.intangible</field>
+            <field name="view_mode">calendar,list,form</field>
+            <field name="view_id" ref="view_activo_intangible_calendar"/>
+        </record>
+
+        <menuitem
+            id="menu_activo_intangible_calendar"
+            name="Calendario"
+            action="action_activo_intangible_calendar"
+            parent="menu_activo_intangible_root"
+            sequence="20"/>
     </data>
 </odoo>
