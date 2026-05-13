@@ -207,8 +207,6 @@ class ActivoIntangible(models.Model):
         for record in self:
             if not record.renewal_date:
                 raise UserError("Error: No se puede activar el activo sin una Fecha de Renovación.")
-            if not record.attachment_ids:
-                raise UserError("Error: No se puede activar el activo sin adjuntar al menos un documento de evidencia.")
             
             today = fields.Date.today()
             if record.renewal_date < today:
