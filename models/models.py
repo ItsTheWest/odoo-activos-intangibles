@@ -184,6 +184,8 @@ class ActivoIntangible(models.Model):
 
     @api.onchange('concession_date', 'renewal_date')
     def _onchange_dates(self):
+        """Validates that concession_date < renewal_date and warns if the asset
+        is near expiry (≤ 60 days). Runs client-side on field change."""
         if self.concession_date and self.renewal_date:
             if self.concession_date > self.renewal_date:
                 return {
@@ -193,10 +195,79 @@ class ActivoIntangible(models.Model):
                     }
                 }
 
+        # Near-expiry real-time warning — shown as a toast while filling the form.
+        if self.renewal_date:
+            today = fields.Date.today()
+            days_left = (self.renewal_date - today).days
+            if 0 < days_left <= 60:
+                return {
+                    'warning': {
+                        'title': '⚠️ Activo Próximo a Vencer',
+                        'message': (
+                            f'La fecha de renovación está a solo {days_left} día(s). '
+                            'Este activo quedará en estado "Por Expirar" inmediatamente. '
+                            'Asegúrese de que la fecha es correcta antes de guardar.'
+                        ),
+                    }
+                }
+
     @api.onchange('asset_type_id', 'concession_date')
     def _onchange_asset_type_dates(self):
+        """Auto-fills renewal_date from asset type lifespan when concession_date is set."""
         if self.asset_type_id and self.asset_type_id.lifespan_days > 0 and self.concession_date:
             self.renewal_date = self.concession_date + timedelta(days=self.asset_type_id.lifespan_days)
+
+    def action_check_near_expiry(self):
+        """
+        Called by the 'Guardar' button in the form header for NEW records only.
+
+        FLOW:
+          1. If renewal_date is NOT within 60 days → save the record normally.
+          2. If renewal_date IS within 60 days → open the confirmation wizard.
+             The wizard stores the current (unsaved) field values and gives the
+             user the choice to confirm or cancel.
+
+        WHY a custom button instead of overriding create()?
+          Odoo's create() cannot return an ir.actions dict — it must return the
+          new record. The only clean way to intercept a save and open a dialog
+          is through a button-triggered action, which CAN return a window action.
+        """
+        self.ensure_one()
+        today = fields.Date.today()
+
+        # Only apply the check when creating (id is not yet persisted).
+        if not self.renewal_date or self.id:
+            return {'type': 'ir.actions.act_window_close'}
+
+        days_left = (self.renewal_date - today).days
+        if 0 < days_left <= 60:
+            # Build the wizard with the pending values from the virtual record.
+            wizard = self.env['activo.near.expiry.wizard'].create({
+                'name': self.name,
+                'renewal_date': self.renewal_date,
+                'days_left': days_left,
+                'pending_vals_json': str({
+                    'name': self.name,
+                    'asset_type_id': self.asset_type_id.id,
+                    'registration_number': self.registration_number,
+                    'concession_date': str(self.concession_date) if self.concession_date else False,
+                    'renewal_date': str(self.renewal_date),
+                    'responsible_id': self.responsible_id.id if self.responsible_id else False,
+                    'state': 'por_expirar',  # Force correct state for near-expiry assets.
+                }),
+            })
+            return {
+                'name': '⚠️ Confirmar Activo Próximo a Vencer',
+                'type': 'ir.actions.act_window',
+                'res_model': 'activo.near.expiry.wizard',
+                'res_id': wizard.id,
+                'view_mode': 'form',
+                'target': 'new',
+            }
+
+        # No expiry concern: close the dialog (the standard Save already fired).
+        return {'type': 'ir.actions.act_window_close'}
+
 
 
     @api.model
@@ -303,4 +374,47 @@ class ActivoDeleteAttachmentWizard(models.TransientModel):
         self.ensure_one()
         if self.attachment_id:
             self.attachment_id.unlink()
+        return {'type': 'ir.actions.act_window_close'}
+
+
+class ActivoNearExpiryWizard(models.TransientModel):
+    """
+    NEAR-EXPIRY CONFIRMATION WIZARD
+
+    This wizard is opened when a user tries to create an asset whose
+    renewal_date is within 60 days. It stores the pending creation values
+    and gives the user two choices:
+      - Confirm: creates the asset with 'skip_near_expiry_check' context flag.
+      - Cancel: discards the creation entirely.
+    """
+    _name = 'activo.near.expiry.wizard'
+    _description = 'Confirmación de activo próximo a vencer'
+
+    name = fields.Char(string="Nombre del Activo", readonly=True)
+    renewal_date = fields.Date(string="Fecha de Renovación", readonly=True)
+    days_left = fields.Integer(string="Días Restantes", readonly=True)
+    # Stores the serialized vals dict so confirm() can re-run create().
+    pending_vals_json = fields.Text(string="Datos Pendientes", readonly=True)
+
+    def action_confirm_create(self):
+        """
+        Confirms creation: re-calls create() with the skip flag set.
+        The context flag 'skip_near_expiry_check' bypasses the guard in create().
+        """
+        self.ensure_one()
+        import ast
+        vals = ast.literal_eval(self.pending_vals_json)
+        self.env['activo.intangible'].with_context(
+            skip_near_expiry_check=True
+        ).create(vals)
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Activos Intangibles',
+            'res_model': 'activo.intangible',
+            'view_mode': 'list,form',
+            'target': 'current',
+        }
+
+    def action_cancel(self):
+        """Discards the pending creation and closes the wizard."""
         return {'type': 'ir.actions.act_window_close'}
