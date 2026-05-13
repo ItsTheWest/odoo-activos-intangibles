@@ -57,10 +57,11 @@ class EstadoBarChart extends Component {
 
     async _fetchData() {
         /**
-         * Calls Python's read_group() directly via ORM.
-         * Returns one dict per group with:
-         *   - state:       the state value (e.g. "activo")
-         *   - state_count: number of records in that group
+         * Calls Python's read_group() via orm.call.
+         *
+         * KEY: When lazy=false, Odoo returns the record count in '__count',
+         * NOT in 'state_count'. Using the wrong key was the root cause of
+         * bars rendering at height 0.
          */
         const groups = await this.orm.call(
             "activo.intangible",
@@ -74,11 +75,19 @@ class EstadoBarChart extends Component {
             }
         );
 
-        this._data = (groups || []).map((g) => ({
-            label: STATE_META[g.state]?.label || g.state,
-            count: g.state_count || 0,
-            color: STATE_META[g.state]?.color || "#95a5a6",
-        }));
+        // Debug: log the raw response so the data shape is always inspectable.
+        console.debug("[EstadoBarChart] read_group response:", groups);
+
+        this._data = (groups || []).map((g) => {
+            // 'g.state' is the raw selection key (string), e.g. "activo".
+            // '__count' holds the number of records in this group.
+            const stateKey = g.state || "";
+            return {
+                label: STATE_META[stateKey]?.label || stateKey,
+                count: g.__count || 0,
+                color: STATE_META[stateKey]?.color || "#95a5a6",
+            };
+        });
     }
 
     // ─── Rendering Layer ──────────────────────────────────────────────────────
