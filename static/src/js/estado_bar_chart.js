@@ -5,6 +5,12 @@ import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 import { loadJS } from "@web/core/assets";
 
+// ─── Why rpc instead of orm.readGroup? ───────────────────────────────────────
+// In standalone view_widgets components, useService("orm") returns a limited
+// proxy that does NOT expose readGroup. We call the Python read_group method
+// directly via the rpc service — universally compatible across all Odoo versions.
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ESTADO BAR CHART WIDGET
 // Standalone OWL component registered in 'view_widgets'.
@@ -23,7 +29,8 @@ class EstadoBarChart extends Component {
     static template = "gestion_activos_intangibles.EstadoBarChart";
 
     setup() {
-        this.orm       = useService("orm");
+        // Use rpc service directly — more reliable than orm.readGroup in widget context.
+        this.rpc       = useService("rpc");
         this.canvasRef = useRef("barCanvas");
         this._chart    = null;
         this._data     = [];
@@ -51,17 +58,22 @@ class EstadoBarChart extends Component {
 
     async _fetchData() {
         /**
-         * readGroup(model, domain, fields, groupby)
-         * Returns one object per group with:
-         *   - state: the state value
+         * Calls Python's read_group() directly via JSON-RPC.
+         * Returns one dict per group with:
+         *   - state:       the state value (e.g. "activo")
          *   - state_count: number of records in that group
          */
-        const groups = await this.orm.readGroup(
-            "activo.intangible",
-            [],
-            ["state"],
-            ["state"]
-        );
+        const groups = await this.rpc("/web/dataset/call_kw", {
+            model:  "activo.intangible",
+            method: "read_group",
+            args:   [],
+            kwargs: {
+                domain:  [],
+                fields:  ["state"],
+                groupby: ["state"],
+                lazy:    false,
+            },
+        });
 
         this._data = (groups || []).map((g) => ({
             label: STATE_META[g.state]?.label || g.state,
