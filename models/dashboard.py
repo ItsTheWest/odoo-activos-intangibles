@@ -259,3 +259,55 @@ class ActivoIntangibleDashboard(models.TransientModel):
             'target': 'current',
         }
 
+    # -----------------------------------------------------------------------
+    # KPI NAVIGATION ACTIONS (Drill-down from dashboard cards)
+    # -----------------------------------------------------------------------
+
+    def action_view_all(self):
+        return {
+            'name': 'Todos los Activos',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible',
+            'view_mode': 'list,calendar,form',
+            'target': 'current',
+        }
+
+    def action_view_active(self):
+        return {
+            'name': 'Activos Activos',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible',
+            'view_mode': 'list,calendar,form',
+            'context': {'search_default_filter_activo': 1},
+            'target': 'current',
+        }
+
+    def action_view_expiring(self):
+        return {
+            'name': 'Activos Por Expirar',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible',
+            'view_mode': 'list,calendar,form',
+            'context': {'search_default_filter_por_expirar': 1},
+            'target': 'current',
+        }
+
+    def action_view_expired(self):
+        return {
+            'name': 'Activos Expirados',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible',
+            'view_mode': 'list,calendar,form',
+            'context': {'search_default_filter_expirado': 1},
+            'target': 'current',
+        }
+
+    def action_view_inactive(self):
+        return {
+            'name': 'Activos Inactivos',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible',
+            'view_mode': 'list,calendar,form',
+            'context': {'search_default_filter_inactivo': 1},
+            'target': 'current',
+        }

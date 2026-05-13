@@ -21,50 +21,56 @@
               <div class="row mb-3">
                 <!-- Valoración Total -->
                 <div class="col-12 col-md-4 mb-2">
-                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1a6b3c 0%, #2d9b5e 100%);">
-                    <div class="card-body text-white">
-                      <div class="d-flex align-items-center mb-1">
-                        <i class="fa fa-dollar-sign fa-2x me-2 opacity-75"/>
-                        <span class="text-uppercase small fw-bold opacity-75">Valoración Total</span>
+                  <button name="action_view_all" type="object" class="o_dashboard_card_btn w-100 h-100 p-0 border-0 bg-transparent text-start">
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1a6b3c 0%, #2d9b5e 100%);">
+                      <div class="card-body text-white">
+                        <div class="d-flex align-items-center mb-1">
+                          <i class="fa fa-dollar-sign fa-2x me-2 opacity-75"/>
+                          <span class="text-uppercase small fw-bold opacity-75">Valoración Total</span>
+                        </div>
+                        <h3 class="card-title fw-bold mb-0">
+                          <field name="valoracion_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        </h3>
+                        <p class="card-text small opacity-75 mt-1">Valor contable total de todos los activos</p>
                       </div>
-                      <h3 class="card-title fw-bold mb-0">
-                        <field name="valoracion_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                      </h3>
-                      <p class="card-text small opacity-75 mt-1">Valor contable total de todos los activos</p>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 <!-- Total Activos -->
                 <div class="col-12 col-md-4 mb-2">
-                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1155cc 0%, #3a7bd5 100%);">
-                    <div class="card-body text-white">
-                      <div class="d-flex align-items-center mb-1">
-                        <i class="fa fa-archive fa-2x me-2 opacity-75"/>
-                        <span class="text-uppercase small fw-bold opacity-75">Total Registrados</span>
+                  <button name="action_view_all" type="object" class="o_dashboard_card_btn w-100 h-100 p-0 border-0 bg-transparent text-start">
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1155cc 0%, #3a7bd5 100%);">
+                      <div class="card-body text-white">
+                        <div class="d-flex align-items-center mb-1">
+                          <i class="fa fa-archive fa-2x me-2 opacity-75"/>
+                          <span class="text-uppercase small fw-bold opacity-75">Total Registrados</span>
+                        </div>
+                        <h3 class="card-title fw-bold mb-0">
+                          <field name="total_activos"/>
+                        </h3>
+                        <p class="card-text small opacity-75 mt-1">Activos intangibles en el sistema</p>
                       </div>
-                      <h3 class="card-title fw-bold mb-0">
-                        <field name="total_activos"/>
-                      </h3>
-                      <p class="card-text small opacity-75 mt-1">Activos intangibles en el sistema</p>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 <!-- Activos Activos -->
                 <div class="col-12 col-md-4 mb-2">
-                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #145a32 0%, #27ae60 100%);">
-                    <div class="card-body text-white">
-                      <div class="d-flex align-items-center mb-1">
-                        <i class="fa fa-check-circle fa-2x me-2 opacity-75"/>
-                        <span class="text-uppercase small fw-bold opacity-75">Activos</span>
+                  <button name="action_view_active" type="object" class="o_dashboard_card_btn w-100 h-100 p-0 border-0 bg-transparent text-start">
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #145a32 0%, #27ae60 100%);">
+                      <div class="card-body text-white">
+                        <div class="d-flex align-items-center mb-1">
+                          <i class="fa fa-check-circle fa-2x me-2 opacity-75"/>
+                          <span class="text-uppercase small fw-bold opacity-75">Activos</span>
+                        </div>
+                        <h3 class="card-title fw-bold mb-0">
+                          <field name="activos_activos"/>
+                        </h3>
+                        <p class="card-text small opacity-75 mt-1">En estado Activo y vigentes</p>
                       </div>
-                      <h3 class="card-title fw-bold mb-0">
-                        <field name="activos_activos"/>
-                      </h3>
-                      <p class="card-text small opacity-75 mt-1">En estado Activo y vigentes</p>
                     </div>
-                  </div>
+                  </button>
                 </div>
               </div>
 
@@ -72,50 +78,56 @@
               <div class="row mb-3">
                 <!-- Por Expirar -->
                 <div class="col-12 col-md-4 mb-2">
-                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #9c5700 0%, #e67e22 100%);">
-                    <div class="card-body text-white">
-                      <div class="d-flex align-items-center mb-1">
-                        <i class="fa fa-exclamation-triangle fa-2x me-2 opacity-75"/>
-                        <span class="text-uppercase small fw-bold opacity-75">Por Expirar</span>
+                  <button name="action_view_expiring" type="object" class="o_dashboard_card_btn w-100 h-100 p-0 border-0 bg-transparent text-start">
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #9c5700 0%, #e67e22 100%);">
+                      <div class="card-body text-white">
+                        <div class="d-flex align-items-center mb-1">
+                          <i class="fa fa-exclamation-triangle fa-2x me-2 opacity-75"/>
+                          <span class="text-uppercase small fw-bold opacity-75">Por Expirar</span>
+                        </div>
+                        <h3 class="card-title fw-bold mb-0">
+                          <field name="activos_por_expirar"/>
+                        </h3>
+                        <p class="card-text small opacity-75 mt-1">Vencen en los próximos 60 días</p>
                       </div>
-                      <h3 class="card-title fw-bold mb-0">
-                        <field name="activos_por_expirar"/>
-                      </h3>
-                      <p class="card-text small opacity-75 mt-1">Vencen en los próximos 60 días</p>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 <!-- Expirados -->
                 <div class="col-12 col-md-4 mb-2">
-                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #7b1a1a 0%, #c0392b 100%);">
-                    <div class="card-body text-white">
-                      <div class="d-flex align-items-center mb-1">
-                        <i class="fa fa-times-circle fa-2x me-2 opacity-75"/>
-                        <span class="text-uppercase small fw-bold opacity-75">Expirados</span>
+                  <button name="action_view_expired" type="object" class="o_dashboard_card_btn w-100 h-100 p-0 border-0 bg-transparent text-start">
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #7b1a1a 0%, #c0392b 100%);">
+                      <div class="card-body text-white">
+                        <div class="d-flex align-items-center mb-1">
+                          <i class="fa fa-times-circle fa-2x me-2 opacity-75"/>
+                          <span class="text-uppercase small fw-bold opacity-75">Expirados</span>
+                        </div>
+                        <h3 class="card-title fw-bold mb-0">
+                          <field name="activos_expirados"/>
+                        </h3>
+                        <p class="card-text small opacity-75 mt-1">Requieren renovación urgente</p>
                       </div>
-                      <h3 class="card-title fw-bold mb-0">
-                        <field name="activos_expirados"/>
-                      </h3>
-                      <p class="card-text small opacity-75 mt-1">Requieren renovación urgente</p>
                     </div>
-                  </div>
+                  </button>
                 </div>
 
                 <!-- Inactivos -->
                 <div class="col-12 col-md-4 mb-2">
-                  <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1a3a5c 0%, #2980b9 100%);">
-                    <div class="card-body text-white">
-                      <div class="d-flex align-items-center mb-1">
-                        <i class="fa fa-pause-circle fa-2x me-2 opacity-75"/>
-                        <span class="text-uppercase small fw-bold opacity-75">Inactivos</span>
+                  <button name="action_view_inactive" type="object" class="o_dashboard_card_btn w-100 h-100 p-0 border-0 bg-transparent text-start">
+                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #1a3a5c 0%, #2980b9 100%);">
+                      <div class="card-body text-white">
+                        <div class="d-flex align-items-center mb-1">
+                          <i class="fa fa-pause-circle fa-2x me-2 opacity-75"/>
+                          <span class="text-uppercase small fw-bold opacity-75">Inactivos</span>
+                        </div>
+                        <h3 class="card-title fw-bold mb-0">
+                          <field name="activos_inactivos"/>
+                        </h3>
+                        <p class="card-text small opacity-75 mt-1">Activos desactivados temporalmente</p>
                       </div>
-                      <h3 class="card-title fw-bold mb-0">
-                        <field name="activos_inactivos"/>
-                      </h3>
-                      <p class="card-text small opacity-75 mt-1">Activos desactivados temporalmente</p>
                     </div>
-                  </div>
+                  </button>
                 </div>
               </div>
 

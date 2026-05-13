@@ -172,6 +172,7 @@
           <filter string="Activos" name="filter_activo" domain="[('state', '=', 'activo')]"/>
           <filter string="Por Expirar" name="filter_por_expirar" domain="[('state', '=', 'por_expirar')]"/>
           <filter string="Expirados" name="filter_expirado" domain="[('state', '=', 'expirado')]"/>
+          <filter string="Inactivos" name="filter_inactivo" domain="[('state', '=', 'inactivo')]"/>
 
           <group>
             <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type_id'}"/>
