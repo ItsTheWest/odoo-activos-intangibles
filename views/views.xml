@@ -17,10 +17,22 @@
             <header>
             <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state not in ('activo', 'por_expirar')"/>
             <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state not in ('inactivo', 'expirado', 'por_expirar')" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
+            <!--
+              NEAR-EXPIRY GUARD: Visible only on new (unsaved) records.
+              When clicked, it triggers a server-side check. If renewal_date is ≤60 days,
+              a confirmation wizard is opened before the record is persisted.
+              'invisible="id"' hides the button once the record has been saved (id exists).
+            -->
+            <button name="action_check_near_expiry" string="Verificar y Guardar" type="object"
+                    class="oe_highlight me-2"
+                    invisible="id"
+                    save="True"
+                    help="Guarda el activo y verifica si la fecha de renovación está próxima a vencer."/>
             
             <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
             <field name="state" widget="statusbar" statusbar_visible="activo,por_expirar,expirado,inactivo"/>
           </header>
+
           <!-- ========================================================= -->
           <!-- 1.2 CUERPO (SHEET): Contenido principal del formulario    -->
           <!-- ========================================================= -->
@@ -218,10 +230,26 @@
         parent="menu_activo_intangible_root"
         sequence="10"/>
 
+    <!-- SUBMENÚ NUEVO ACTIVO: Abre directamente el formulario en blanco para crear un registro. -->
+    <record id="action_nuevo_activo_intangible" model="ir.actions.act_window">
+      <field name="name">Nuevo Activo Intangible</field>
+      <field name="res_model">activo.intangible</field>
+      <field name="view_mode">form</field>
+      <field name="view_id" ref="view_activo_intangible_form"/>
+      <field name="target">current</field>
+    </record>
+
+    <menuitem id="menu_nuevo_activo_intangible"
+        name="Nuevo Activo"
+        action="action_nuevo_activo_intangible"
+        parent="menu_activo_intangible_root"
+        sequence="20"/>
+
     <menuitem id="menu_activo_intangible_config"
         name="Configuración"
         parent="menu_activo_intangible_root"
         sequence="100"/>
+
 
 
     <!-- ========================================================= -->
@@ -335,5 +363,38 @@
       </field>
     </record>
 
+    <!-- Wizard de Confirmación: Activo Próximo a Vencer -->
+    <record id="view_activo_near_expiry_wizard_form" model="ir.ui.view">
+      <field name="name">activo.near.expiry.wizard.form</field>
+      <field name="model">activo.near.expiry.wizard</field>
+      <field name="arch" type="xml">
+        <!--
+          WIZARD NEAR EXPIRY: Displayed when renewal_date is within 60 days on creation.
+          Forces the user to make an explicit, conscious decision before the record is saved.
+        -->
+        <form string="Activo Próximo a Vencer">
+          <sheet>
+            <div class="o_form_view text-center py-4">
+              <span class="fa fa-exclamation-triangle fa-4x text-warning mb-3 d-block"/>
+              <h3 class="text-warning">Atención: Activo Próximo a Vencer</h3>
+              <p class="mt-3">El activo <strong><field name="name" readonly="1" nolabel="1"/></strong>
+                tiene una fecha de renovación de <strong><field name="renewal_date" readonly="1" nolabel="1"/></strong>,
+                lo que significa que <strong>vence en <field name="days_left" readonly="1" nolabel="1"/> día(s)</strong>.
+              </p>
+              <p class="text-muted mt-2">
+                Este activo será registrado en estado <strong>"Por Expirar"</strong>.
+                ¿Desea continuar de todas formas?
+              </p>
+            </div>
+          </sheet>
+          <footer>
+            <button name="action_confirm_create" string="Sí, Registrar de Todas Formas" type="object" class="btn-warning" icon="fa-check"/>
+            <button name="action_cancel" string="Cancelar" type="object" class="btn-secondary"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
   </data>
 </odoo>
+
