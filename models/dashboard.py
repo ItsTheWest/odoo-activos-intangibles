@@ -64,11 +64,10 @@ class ActivoIntangibleDashboard(models.TransientModel):
     )
 
     # -----------------------------------------------------------------------
-    # DYNAMIC SVG GRAPHS (The "WOW" Factor)
-    # We use fields.Html to render raw SVG strings. This avoids the complexity
-    # of Odoo's JS registry (OWL) while maintaining high performance.
+    # PYTHON SVG GRAPHS (Remaining server-side charts)
+    # graph_estado_svg has been migrated to the OWL/Chart.js widget.
+    # These two remain Python-generated until their migration is planned.
     # -----------------------------------------------------------------------
-    graph_estado_svg = fields.Html(string="Gráfico de Estados", compute="_compute_graphs")
     graph_tipo_svg = fields.Html(string="Gráfico de Tipos", compute="_compute_graphs")
     graph_vencimientos_svg = fields.Html(string="Línea de Tiempo", compute="_compute_graphs")
 
@@ -82,9 +81,7 @@ class ActivoIntangibleDashboard(models.TransientModel):
         activos = self.env['activo.intangible'].search([])
         
         for record in self:
-            # We assign the raw SVG string to the HTML field.
-            # Odoo's 'html' widget will render this directly in the browser.
-            record.graph_estado_svg = self._generate_bar_chart(activos)
+            # graph_estado_svg removed — now rendered by the OWL EstadoBarChart widget.
             record.graph_tipo_svg = self._generate_pie_chart(activos)
             record.graph_vencimientos_svg = self._generate_timeline_chart(activos)
 
@@ -110,46 +107,9 @@ class ActivoIntangibleDashboard(models.TransientModel):
         return sum(activos.mapped('valor_contable'))
 
     # -----------------------------------------------------------------------
-    # SVG RENDERING ENGINE (The Math behind the visuals)
+    # SVG RENDERING ENGINE (Python-generated — Tipo and Vencimientos charts)
+    # Note: Bar chart for Estado has been migrated to OWL + Chart.js.
     # -----------------------------------------------------------------------
-
-    def _generate_bar_chart(self, activos):
-        """
-        BAR CHART GENERATOR
-        Logic: Calculate the height of each bar relative to the maximum value.
-        - max_height: 150px
-        - Formula: (current_value / max_value) * max_height
-        """
-        states = {
-            'activo': {'label': 'Activo', 'color': '#27ae60', 'count': 0},
-            'por_expirar': {'label': 'Por Expirar', 'color': '#e67e22', 'count': 0},
-            'expirado': {'label': 'Expirado', 'color': '#c0392b', 'count': 0},
-            'inactivo': {'label': 'Inactivo', 'color': '#2980b9', 'count': 0},
-        }
-        for a in activos:
-            if a.state in states:
-                states[a.state]['count'] += 1
-
-        # Max val prevents division by zero and sets the chart scale
-        max_val = max([s['count'] for s in states.values()] or [1])
-        
-        # ViewBox defines the internal coordinate system of the SVG
-        svg = '<div class="text-center"><svg viewBox="0 0 400 200" style="max-height:250px; width:100%;">'
-        x = 50
-        for code, data in states.items():
-            h = (data['count'] / max_val) * 150 if max_val > 0 else 0
-            # SVG coordinates start at top-left (0,0). To draw bars from bottom-up,
-            # we subtract height from the baseline (170).
-            svg += f"""
-                <rect x="{x}" y="{170 - h}" width="40" height="{h}" fill="{data['color']}" rx="4">
-                    <title>{data['label']}: {data['count']}</title>
-                </rect>
-                <text x="{x + 20}" y="190" font-size="10" text-anchor="middle" fill="#666">{data['label']}</text>
-                <text x="{x + 20}" y="{165 - h}" font-size="12" font-weight="bold" text-anchor="middle" fill="{data['color']}">{data['count']}</text>
-            """
-            x += 85
-        svg += '</svg></div>'
-        return svg
 
     def _generate_pie_chart(self, activos):
         """
