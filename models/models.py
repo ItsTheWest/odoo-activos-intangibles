@@ -204,17 +204,33 @@ class ActivoIntangible(models.Model):
 
     def action_renovar(self):
         """Reactiva un activo evaluando su fecha de renovación."""
-        for record in self:
-            if not record.renewal_date:
-                raise UserError("Error: No se puede activar el activo sin una Fecha de Renovación.")
-            
-            today = fields.Date.today()
-            if record.renewal_date < today:
-                record.state = 'expirado'
-            elif record.renewal_date <= today + timedelta(days=60):
-                record.state = 'por_expirar'
-            else:
-                record.state = 'activo'
+        self.ensure_one()
+        if not self.renewal_date:
+            raise UserError("Error: No se puede activar el activo sin una Fecha de Renovación.")
+        
+        today = fields.Date.today()
+        if self.renewal_date < today:
+            self.state = 'expirado'
+        elif self.renewal_date <= today + timedelta(days=60):
+            # En lugar de solo cambiar el estado, levanta el modal de aviso
+            days_left = (self.renewal_date - today).days
+            wizard = self.env['activo.near.expiry.wizard'].create({
+                'name': self.name,
+                'renewal_date': self.renewal_date,
+                'days_left': days_left,
+                'activo_id': self.id,
+                'action_type': 'activate',
+            })
+            return {
+                'name': '⚠️ Confirmar Activación Próxima a Vencer',
+                'type': 'ir.actions.act_window',
+                'res_model': 'activo.near.expiry.wizard',
+                'res_id': wizard.id,
+                'view_mode': 'form',
+                'target': 'new',
+            }
+        else:
+            self.state = 'activo'
 
     def action_check_near_expiry(self):
         """
@@ -405,7 +421,7 @@ class ActivoDeleteAttachmentWizard(models.TransientModel):
 class ActivoNearExpiryWizard(models.TransientModel):
     """
     WIZARD: Confirmación de activo próximo a vencer.
-    Se activa si la fecha de renovación es ≤ 60 días al crear.
+    Se activa si la fecha de renovación es ≤ 60 días al crear o al activar.
     """
     _name = 'activo.near.expiry.wizard'
     _description = 'Confirmación de activo próximo a vencer'
@@ -414,12 +430,26 @@ class ActivoNearExpiryWizard(models.TransientModel):
     renewal_date = fields.Date(string="Fecha de Renovación", readonly=True)
     days_left = fields.Integer(string="Días Restantes", readonly=True)
     pending_vals_json = fields.Text(string="Datos Pendientes", readonly=True)
+    
+    activo_id = fields.Many2one('activo.intangible', string="Activo Existente")
+    action_type = fields.Selection([
+        ('create', 'Creación'),
+        ('activate', 'Activación')
+    ], string="Tipo de Acción", default='create')
 
-    def action_confirm_create(self):
+    def action_confirm(self):
+        """Confirma la acción (crear el activo o cambiar su estado a por_expirar)."""
         self.ensure_one()
-        import ast
-        vals = ast.literal_eval(self.pending_vals_json)
-        self.env['activo.intangible'].with_context(skip_near_expiry_check=True).create(vals)
+        
+        if self.action_type == 'create':
+            import ast
+            vals = ast.literal_eval(self.pending_vals_json)
+            self.env['activo.intangible'].with_context(skip_near_expiry_check=True).create(vals)
+            
+        elif self.action_type == 'activate':
+            if self.activo_id:
+                self.activo_id.write({'state': 'por_expirar'})
+                
         return {
             'type': 'ir.actions.act_window',
             'name': 'Activos Intangibles',

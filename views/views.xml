@@ -230,21 +230,6 @@
         parent="menu_activo_intangible_root"
         sequence="10"/>
 
-    <!-- SUBMENÚ NUEVO ACTIVO: Abre directamente el formulario en blanco para crear un registro. -->
-    <record id="action_nuevo_activo_intangible" model="ir.actions.act_window">
-      <field name="name">Nuevo Activo Intangible</field>
-      <field name="res_model">activo.intangible</field>
-      <field name="view_mode">form</field>
-      <field name="view_id" ref="view_activo_intangible_form"/>
-      <field name="target">current</field>
-    </record>
-
-    <menuitem id="menu_nuevo_activo_intangible"
-        name="Nuevo Activo"
-        action="action_nuevo_activo_intangible"
-        parent="menu_activo_intangible_root"
-        sequence="20"/>
-
     <menuitem id="menu_activo_intangible_config"
         name="Configuración"
         parent="menu_activo_intangible_root"
@@ -388,7 +373,7 @@
             </div>
           </sheet>
           <footer>
-            <button name="action_confirm_create" string="Sí, Registrar de Todas Formas" type="object" class="btn-warning" icon="fa-check"/>
+            <button name="action_confirm" string="Sí, Continuar de Todas Formas" type="object" class="btn-warning" icon="fa-check"/>
             <button name="action_cancel" string="Cancelar" type="object" class="btn-secondary"/>
           </footer>
         </form>
