@@ -107,27 +107,12 @@ class ActivoIntangible(models.Model):
         return super(ActivoIntangible, self).create(vals_list)
 
     def write(self, vals):
-        """Sobrescribe la actualización para asignar estado automático y gestionar adjuntos."""
+        """Sobrescribe la actualización para gestionar adjuntos."""
         # 1. Ejecutar el guardado estándar
         before_attachments = self.attachment_ids
         res = super(ActivoIntangible, self).write(vals)
         
-        # 2. Asignación automática de estado si se actualizó la fecha de renovación
-        if 'renewal_date' in vals and vals['renewal_date'] and vals.get('state') != 'inactivo':
-            today = fields.Date.today()
-            rd = fields.Date.to_date(vals['renewal_date'])
-            
-            new_state = 'activo'
-            if rd < today:
-                new_state = 'expirado'
-            elif rd <= today + timedelta(days=60):
-                new_state = 'por_expirar'
-                
-            for record in self:
-                if record.state != 'inactivo' and record.state != new_state:
-                    super(ActivoIntangible, record).write({'state': new_state})
-                    
-        # 3. Eliminar físicamente los adjuntos si fueron removidos del registro
+        # 2. Eliminar físicamente los adjuntos si fueron removidos del registro
         if 'attachment_ids' in vals:
             after_attachments = self.attachment_ids
             removed_attachments = before_attachments - after_attachments
