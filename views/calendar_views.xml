@@ -27,11 +27,5 @@
             <field name="view_id" ref="view_activo_intangible_calendar"/>
         </record>
 
-        <menuitem
-            id="menu_activo_intangible_calendar"
-            name="Calendario"
-            action="action_activo_intangible_calendar"
-            parent="menu_activo_intangible_root"
-            sequence="20"/>
     </data>
 </odoo>

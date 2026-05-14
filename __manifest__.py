@@ -24,15 +24,30 @@ Long description of module's purpose
         'security/ir.model.access.csv',
         'data/ir_cron_data.xml',
         'data/data.xml',
-        # views.xml MUST come before evidence_views.xml because the latter
-        # references search and form views defined in the former.
-        'views/views.xml',
+
+        # ── LAYER 1: Core record views ────────────────────────────────────
+        # Load order: form/list first so that actions in later files can
+        # reference them by xml_id without forward-reference errors.
         'views/activo_intangible_form_view.xml',
         'views/activo_intangible_list_view.xml',
+
+        # ── LAYER 2: Configuration / catalogue views ─────────────────────
         'views/activo_intangible_type_views.xml',
+
+        # ── LAYER 3: Evidence UI (ir.attachment extensions) ───────────────
+        'views/activo_intangible_attachment_views.xml',
+
+        # ── LAYER 4: Wizard pop-up views ─────────────────────────────────
+        'views/activo_intangible_wizard_views.xml',
+
+        # ── LAYER 5: Analysis & reporting views ──────────────────────────
         'views/dashboard_views.xml',
-        'views/statistics_views.xml',
         'views/calendar_views.xml',
+
+        # ── LAYER 6: Navigation (menus + actions) ────────────────────────
+        # MUST be last: every action and view xml_id referenced here must
+        # already exist in the database before this file is processed.
+        'views/activo_intangible_menus_actions.xml',
     ],
     # only loaded in demonstration mode
     'demo': [

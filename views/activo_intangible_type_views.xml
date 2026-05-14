@@ -87,11 +87,5 @@
             <field name="view_mode">kanban,form</field>
         </record>
 
-        <!-- Menú -->
-        <menuitem id="menu_activo_intangible_type"
-            name="Tipos de Activos"
-            parent="menu_activo_intangible_config"
-            action="action_activo_intangible_type"
-            sequence="10"/>
     </data>
 </odoo>
