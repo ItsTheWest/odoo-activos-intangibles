@@ -180,8 +180,9 @@
                         <i class="fa fa-external-link me-1"/> Ver completo
                       </button>
                     </div>
-                    <div class="card-body p-3">
-                      <field name="graph_tipo_svg" widget="html" nolabel="1"/>
+                    <div class="card-body p-3" style="height: 260px;">
+                      <!-- OWL Chart.js widget — replaces legacy SVG -->
+                      <widget name="tipo_activo_pie_chart"/>
                     </div>
                   </div>
                 </div>
