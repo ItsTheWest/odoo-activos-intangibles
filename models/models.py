@@ -161,9 +161,10 @@ class ActivoIntangible(models.Model):
 
     @api.onchange('asset_type_id', 'concession_date')
     def _onchange_asset_type_dates(self):
-        """Autocompleta la fecha de renovación basada en la vigencia del tipo de activo."""
+        """Autocompleta la fecha de renovación basada en la vigencia del tipo de activo, solo si no hay una fecha establecida."""
         if self.asset_type_id and self.asset_type_id.lifespan_days > 0 and self.concession_date:
-            self.renewal_date = self.concession_date + timedelta(days=self.asset_type_id.lifespan_days)
+            if not self.renewal_date:
+                self.renewal_date = self.concession_date + timedelta(days=self.asset_type_id.lifespan_days)
 
     # -------------------------------------------------------------------------
     # 1.5 ACTION METHODS (Botones de Vista)
