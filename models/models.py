@@ -446,10 +446,6 @@ class ActivoNearExpiryWizard(models.TransientModel):
             vals = ast.literal_eval(self.pending_vals_json)
             self.env['activo.intangible'].with_context(skip_near_expiry_check=True).create(vals)
             
-        elif self.action_type == 'activate':
-            if self.activo_id:
-                self.activo_id.write({'state': 'por_expirar'})
-                
         return {
             'type': 'ir.actions.act_window',
             'name': 'Activos Intangibles',

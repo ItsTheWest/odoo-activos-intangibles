@@ -358,6 +358,7 @@
           Forces the user to make an explicit, conscious decision before the record is saved.
         -->
         <form string="Activo Próximo a Vencer">
+          <field name="action_type" invisible="1"/>
           <sheet>
             <div class="o_form_view text-center py-4">
               <span class="fa fa-exclamation-triangle fa-4x text-warning mb-3 d-block"/>
@@ -366,15 +367,19 @@
                 tiene una fecha de renovación de <strong><field name="renewal_date" readonly="1" nolabel="1"/></strong>,
                 lo que significa que <strong>vence en <field name="days_left" readonly="1" nolabel="1"/> día(s)</strong>.
               </p>
-              <p class="text-muted mt-2">
+              <p class="text-muted mt-2" invisible="action_type == 'activate'">
                 Este activo será registrado en estado <strong>"Por Expirar"</strong>.
                 ¿Desea continuar de todas formas?
+              </p>
+              <p class="text-danger mt-2 fw-bold" invisible="action_type == 'create'">
+                No es posible activar este activo porque su fecha de renovación es menor o igual a 60 días. Por favor, actualice la fecha de renovación antes de intentar activarlo.
               </p>
             </div>
           </sheet>
           <footer>
-            <button name="action_confirm" string="Sí, Continuar de Todas Formas" type="object" class="btn-warning" icon="fa-check"/>
-            <button name="action_cancel" string="Cancelar" type="object" class="btn-secondary"/>
+            <button name="action_confirm" string="Sí, Continuar de Todas Formas" type="object" class="btn-warning" icon="fa-check" invisible="action_type == 'activate'"/>
+            <button string="Cancelar" class="btn-secondary" special="cancel" invisible="action_type == 'activate'"/>
+            <button string="Entendido" class="btn-primary" special="cancel" invisible="action_type == 'create'"/>
           </footer>
         </form>
       </field>
