@@ -27,6 +27,8 @@ Long description of module's purpose
         # views.xml MUST come before evidence_views.xml because the latter
         # references search and form views defined in the former.
         'views/views.xml',
+        'views/activo_intangible_form_view.xml',
+        'views/activo_intangible_list_view.xml',
         'views/activo_intangible_type_views.xml',
         'views/dashboard_views.xml',
         'views/statistics_views.xml',
