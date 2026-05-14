@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!--
+        Template for the TipoActivoPieChart OWL widget.
+        The <canvas> element is bound via t-ref="pieCanvas" and used by Chart.js
+        in the component's _renderChart() method.
+    -->
+    <t t-name="gestion_activos_intangibles.TipoActivoPieChart">
+        <div class="o_tipo_activo_pie_chart w-100" style="position: relative; height: 220px;">
+            <canvas t-ref="pieCanvas"/>
+        </div>
+    </t>
+
+</templates>
