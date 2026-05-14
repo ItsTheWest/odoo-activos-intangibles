@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- ========================================================= -->
+    <!-- 2. VISTA DE LISTA (TREE / LIST VIEW)                      -->
+    <!-- ========================================================= -->
+    <record id="view_activo_intangible_list" model="ir.ui.view">
+      <field name="name">activo.intangible.list</field>
+      <field name="model">activo.intangible</field>
+      <field name="arch" type="xml">
+        <!-- VISTA DE TABLA: Configuración de colores y columnas para el listado principal -->
+        <list string="Activos Intangibles"
+              decoration-success="state == 'activo'"
+              decoration-warning="state == 'por_expirar'"
+              decoration-info="state == 'inactivo'"
+              decoration-danger="state == 'expirado'">
+          <field name="name"/>
+          <field name="asset_type_id"/>
+          <field name="registration_number"/>
+          <field name="concession_date"/>
+          <field name="renewal_date"/>
+          <field name="responsible_id" widget="many2one_avatar"/>
+          <field name="expense_id"/>
+          <!-- widget="badge": Transforma el texto del estado en una etiqueta de color. -->
+          <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-warning="state == 'por_expirar'" decoration-info="state == 'inactivo'" decoration-danger="state == 'expirado'"/>
+          <!-- Docs column: optional so it does not clutter narrow screens. -->
+          <field name="document_count" string="Docs." optional="show"/>
+        </list>
+      </field>
+    </record>
+  </data>
+</odoo>

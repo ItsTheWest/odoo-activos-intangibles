@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- ================================================================ -->
+    <!-- SEARCH VIEW                                                       -->
+    <!-- Defines the filter bar and groupBy options for the list view.    -->
+    <!-- Must be loaded before the Window Action that references it.      -->
+    <!-- ================================================================ -->
+    <record id="view_activo_intangible_search" model="ir.ui.view">
+      <field name="name">activo.intangible.search</field>
+      <field name="model">activo.intangible</field>
+      <field name="arch" type="xml">
+        <search string="Buscar Activos Intangibles">
+          <field name="name"/>
+          <field name="responsible_id"/>
+
+          <filter string="Activos"     name="filter_activo"      domain="[('state', '=', 'activo')]"/>
+          <filter string="Por Expirar" name="filter_por_expirar" domain="[('state', '=', 'por_expirar')]"/>
+          <filter string="Expirados"   name="filter_expirado"    domain="[('state', '=', 'expirado')]"/>
+          <filter string="Inactivos"   name="filter_inactivo"    domain="[('state', '=', 'inactivo')]"/>
+
+          <group>
+            <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type_id'}"/>
+            <filter string="Estado"         name="group_by_state"      context="{'group_by':'state'}"/>
+            <filter string="Responsable"    name="group_by_responsible" context="{'group_by':'responsible_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+
+    <!-- ================================================================ -->
+    <!-- WINDOW ACTIONS                                                    -->
+    <!-- Each action binds a model to its views (list/form/calendar/etc). -->
+    <!-- Actions whose VIEWS are defined in other files are referenced    -->
+    <!-- here using the full xml_id (module.xml_id) syntax.              -->
+    <!-- ================================================================ -->
+
+    <!-- Main action: opens the Intangible Assets list → calendar → form -->
+    <record id="action_activo_intangible" model="ir.actions.act_window">
+      <field name="name">Activos Intangibles</field>
+      <field name="res_model">activo.intangible</field>
+      <field name="view_mode">list,calendar,form</field>
+      <field name="search_view_id" ref="view_activo_intangible_search"/>
+      <field name="help" type="html">
+        <p class="o_view_nocontent_smiling_face">
+          Crea tu primer activo intangible!
+        </p>
+      </field>
+    </record>
+
+
+    <!-- ================================================================ -->
+    <!-- MENU STRUCTURE — ALL MODULE NAVIGATION CENTRALIZED HERE          -->
+    <!--                                                                  -->
+    <!-- Load order rule: parent nodes must appear before children.       -->
+    <!-- Sequence guide:                                                  -->
+    <!--   10  → Activos       (main asset registry)                      -->
+    <!--   20  → Dashboard     (KPI panel)                                -->
+    <!--   30  → Calendario    (expiry calendar)                          -->
+    <!--   40  → Estadísticas  (graph / pivot analysis)                   -->
+    <!--  100  → Configuración (admin sub-tree)                          -->
+    <!--                                                                  -->
+    <!-- NOTE: Actions referenced here that are defined in OTHER view     -->
+    <!-- files use the full xml_id: gestion_activos_intangibles.<id>     -->
+    <!-- ================================================================ -->
+
+    <!-- ROOT: top-level entry in the App Switcher / nav sidebar -->
+    <menuitem id="menu_activo_intangible_root"
+              name="Activos Intangibles"
+              sequence="10"/>
+
+    <!-- 1. Activos: opens the main list/form of intangible assets -->
+    <menuitem id="menu_activo_intangible"
+              name="Activos"
+              parent="menu_activo_intangible_root"
+              action="action_activo_intangible"
+              sequence="10"/>
+
+    <!-- 2. Estadísticas: KPI panel (action defined in dashboard_views.xml) -->
+    <menuitem id="menu_activo_dashboard"
+              name="Estadísticas"
+              parent="menu_activo_intangible_root"
+              action="gestion_activos_intangibles.action_activo_intangible_dashboard"
+              sequence="20"/>
+
+    <!-- 3. Calendario: calendar view for expiry dates
+         (view + action defined in calendar_views.xml) -->
+    <menuitem id="menu_activo_intangible_calendar"
+              name="Calendario"
+              parent="menu_activo_intangible_root"
+              action="gestion_activos_intangibles.action_activo_intangible_calendar"
+              sequence="30"/>
+
+    <!-- 5. Configuración: parent node — children defined below -->
+    <menuitem id="menu_activo_intangible_config"
+              name="Configuración"
+              parent="menu_activo_intangible_root"
+              sequence="100"/>
+
+    <!-- 5.1 Tipos de Activos: kanban of asset type catalogue
+         (views + action defined in activo_intangible_type_views.xml) -->
+    <menuitem id="menu_activo_intangible_type"
+              name="Tipos de Activos"
+              parent="menu_activo_intangible_config"
+              action="gestion_activos_intangibles.action_activo_intangible_type"
+              sequence="10"/>
+
+  </data>
+</odoo>

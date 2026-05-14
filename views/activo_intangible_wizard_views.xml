@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- ================================================================ -->
+    <!-- WIZARD VIEWS (TransientModel interfaces)                         -->
+    <!-- All pop-up / modal forms used for confirmed user actions live    -->
+    <!-- here so they can be reviewed and updated independently.         -->
+    <!-- ================================================================ -->
+
+    <!-- WIZARD 1: Upload Digital Evidence
+         Opens from the "Adjuntar Archivos" button on the asset form.
+         Accepts multiple files via many2many_binary and links them to
+         the asset on save. -->
+    <record id="view_activo_attachment_wizard_form" model="ir.ui.view">
+      <field name="name">activo.attachment.wizard.form</field>
+      <field name="model">activo.attachment.wizard</field>
+      <field name="arch" type="xml">
+        <form string="Adjuntar Archivos">
+          <sheet>
+            <p class="text-muted">
+              Seleccione los documentos digitales que desea vincular a este activo.
+            </p>
+            <field name="wizard_attachment_ids" widget="many2many_binary" nolabel="1"/>
+          </sheet>
+          <footer>
+            <button name="action_save_attachments" string="Guardar Evidencias"
+                    type="object" class="btn-primary" icon="fa-save"/>
+            <button string="Cancelar" class="btn-secondary" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+
+    <!-- WIZARD 2: Confirm Evidence Deletion
+         Opened via the "Eliminar" option in each attachment card.
+         Forces an explicit confirmation before the file is permanently
+         removed from the database. -->
+    <record id="view_activo_delete_attachment_wizard_form" model="ir.ui.view">
+      <field name="name">activo.delete.attachment.wizard.form</field>
+      <field name="model">activo.delete.attachment.wizard</field>
+      <field name="arch" type="xml">
+        <form string="Eliminar Evidencia">
+          <sheet>
+            <div class="o_form_view text-center py-4">
+              <span class="fa fa-exclamation-triangle fa-3x text-warning mb-3 d-block"/>
+              <h4>¿Está seguro de que desea eliminar este archivo?</h4>
+              <p class="text-muted mt-2">
+                El archivo <strong><field name="attachment_name" readonly="1" nolabel="1"/></strong>
+                será eliminado de forma permanente. Esta acción no se puede deshacer.
+              </p>
+            </div>
+          </sheet>
+          <footer>
+            <button name="action_confirm_delete" string="Sí, Eliminar"
+                    type="object" class="btn-danger" icon="fa-trash"/>
+            <button string="Cancelar" class="btn-secondary" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+
+    <!-- WIZARD 3: Near-Expiry Guard
+         Triggered automatically when:
+           - A new asset is created with renewal_date ≤ 60 days (action_type=create).
+           - The "Activar" button is pressed and renewal_date ≤ 60 days (action_type=activate).
+         Shows distinct messaging and buttons for each scenario. -->
+    <record id="view_activo_near_expiry_wizard_form" model="ir.ui.view">
+      <field name="name">activo.near.expiry.wizard.form</field>
+      <field name="model">activo.near.expiry.wizard</field>
+      <field name="arch" type="xml">
+        <form string="Activo Próximo a Vencer">
+          <!-- Hidden field used by invisible attrs to branch the UI -->
+          <field name="action_type" invisible="1"/>
+          <sheet>
+            <div class="o_form_view text-center py-4">
+              <span class="fa fa-exclamation-triangle fa-4x text-warning mb-3 d-block"/>
+              <h3 class="text-warning">Atención: Activo Próximo a Vencer</h3>
+              <p class="mt-3">
+                El activo <strong><field name="name" readonly="1" nolabel="1"/></strong>
+                tiene una fecha de renovación de <strong><field name="renewal_date" readonly="1" nolabel="1"/></strong>,
+                lo que significa que <strong>vence en <field name="days_left" readonly="1" nolabel="1"/> día(s)</strong>.
+              </p>
+
+              <!-- Shown only during CREATION flow -->
+              <p class="text-muted mt-2" invisible="action_type == 'activate'">
+                Este activo será registrado en estado <strong>"Por Expirar"</strong>.
+                ¿Desea continuar de todas formas?
+              </p>
+
+              <!-- Shown only during ACTIVATION flow -->
+              <p class="text-danger mt-2 fw-bold" invisible="action_type == 'create'">
+                No es posible activar este activo porque su fecha de renovación es menor o igual a
+                60 días. Por favor, actualice la fecha de renovación antes de intentar activarlo.
+              </p>
+            </div>
+          </sheet>
+          <footer>
+            <!-- Creation flow: allow or cancel -->
+            <button name="action_confirm" string="Sí, Continuar de Todas Formas"
+                    type="object" class="btn-warning" icon="fa-check"
+                    invisible="action_type == 'activate'"/>
+            <button string="Cancelar" class="btn-secondary" special="cancel"
+                    invisible="action_type == 'activate'"/>
+
+            <!-- Activation flow: just acknowledge -->
+            <button string="Entendido" class="btn-primary" special="cancel"
+                    invisible="action_type == 'create'"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+  </data>
+</odoo>

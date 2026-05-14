@@ -54,9 +54,11 @@ local_settings.py
 
 # Odoo-specific
 *.log
-/data/
+# Ignore Odoo runtime data (filestore, sessions) — NOT the module's data/ source folder
 /filestore/
 /sessions/
+/data/filestore/
+/data/sessions/
 
 # Environments
 .env

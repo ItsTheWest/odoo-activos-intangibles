@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!--
+        Template for the EstadoBarChart OWL widget.
+        The <canvas> element is bound via t-ref="barCanvas" and used by Chart.js
+        in the component's _renderChart() method.
+        Height is fixed so Chart.js can calculate its responsive width correctly.
+    -->
+    <t t-name="gestion_activos_intangibles.EstadoBarChart">
+        <div class="o_estado_bar_chart w-100" style="position: relative; height: 220px;">
+            <canvas t-ref="barCanvas"/>
+        </div>
+    </t>
+
+</templates>

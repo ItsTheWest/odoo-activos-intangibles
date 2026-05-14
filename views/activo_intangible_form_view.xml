@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+    <!-- ========================================================= -->
+    <!-- 1. VISTA DE FORMULARIO (FORM VIEW)                        -->
+    <!-- ========================================================= -->
+    <!-- <record>: Crea un registro en la base de datos de Odoo. 
+         'model="ir.ui.view"' le dice a Odoo que este registro es una vista de interfaz de usuario. -->
+    <record id="view_activo_intangible_form" model="ir.ui.view">
+      <field name="name">activo.intangible.form</field>  <!-- <field name="name">: Nombre técnico interno de la vista. -->
+      <field name="model">activo.intangible</field>  <!-- <field name="model">: Indica a qué tabla (modelo de Python) pertenece esta vista. -->
+      <field name="arch" type="xml">   <!-- <field name="arch" type="xml">: Aquí dentro va la arquitectura visual de la vista en código XML. -->
+        <form string="Activo Intangible">
+          <!-- <header>: Es la barra gris superior. Se usa para botones de acción y la barra de estado (workflow). -->
+            <!-- ========================================================= -->
+            <!-- 1.1 CABECERA (HEADER): Botones de acción y barra de estado -->
+            <!-- ========================================================= -->
+            <header>
+            <button name="action_inactivar" string="Desactivar" type="object" class="me-2" invisible="state not in ('activo', 'por_expirar')"/>
+            <button name="action_renovar" string="Activar" type="object" class="oe_highlight me-2" invisible="state not in ('inactivo', 'expirado', 'por_expirar')" confirm="¿Está seguro de que desea activar este activo? Por favor, verifique que la fecha de renovación sea correcta."/>
+            <!--
+              NEAR-EXPIRY GUARD: Visible only on new (unsaved) records.
+              When clicked, it triggers a server-side check. If renewal_date is ≤60 days,
+              a confirmation wizard is opened before the record is persisted.
+              'invisible="id"' hides the button once the record has been saved (id exists).
+            -->
+            <button name="action_check_near_expiry" string="Verificar y Guardar" type="object"
+                    class="oe_highlight me-2"
+                    invisible="id"
+                    save="True"
+                    help="Guarda el activo y verifica si la fecha de renovación está próxima a vencer."/>
+            
+            <!-- <field widget="statusbar">: Muestra el campo 'state' como una línea de tiempo (Activo -> Inactivo) en la esquina superior derecha. -->
+            <field name="state" widget="statusbar" statusbar_visible="activo,por_expirar,expirado,inactivo"/>
+          </header>
+
+          <!-- ========================================================= -->
+          <!-- 1.2 CUERPO (SHEET): Contenido principal del formulario    -->
+          <!-- ========================================================= -->
+          <sheet>
+            <style>
+                .hide_add_button .o_kanban_record_add {
+                    display: none !important;
+                }
+            </style>
+
+            <!-- =====================================================
+                 SMART BUTTON BOX — shows document count badge.
+                 Clicking opens a filtered list of ir.attachment for
+                 this specific asset record.
+                 ===================================================== -->
+            <div class="oe_button_box" name="button_box">
+              <!-- Smart buttons irán aquí si hay otros en el futuro -->
+            </div>
+
+            <!-- <div class="oe_title">: Clase CSS estándar de Odoo para el título principal del registro. -->
+            <!-- TÍTULO: Nombre del activo editable solo en modo edición -->
+            <div class="oe_title mb-4">
+              <label for="name" class="oe_edit_only" string="Nombre del Activo"/>
+              <h1>
+                <field name="name" placeholder="Ej. Software de Contabilidad..."/>
+              </h1>
+            </div>
+
+            <!-- <group>: Organiza los campos en dos columnas. -->
+            <!-- CONTENEDOR DE GRUPOS: Organiza los campos principales en columnas -->
+            <group>
+              <group string="Datos Generales">
+                <field name="asset_type_id"/>
+                <field name="registration_number" placeholder="Ej. REG-12345"/>
+              </group>
+
+              <group string="Fechas Clave">
+                <field name="concession_date"/>
+                <field name="renewal_date"/>
+              </group>
+            </group>
+
+            <!-- <notebook>: Sección inferior con pestañas. -->
+            <!-- PANELES DE PESTAÑAS (NOTEBOOK): Información complementaria -->
+            <notebook>
+              <!-- TAB 1: Información Adicional -->
+              <page string="Información Adicional">
+                <group>
+                  <field name="responsible_id" widget="many2one_avatar"/>
+                  <field name="expense_id"/>
+                </group>
+              </page>
+
+              <!-- TAB 2: Evidencias Digitales
+                   Uses the native many2many_binary widget which renders
+                   an inline file list + upload button backed by ir.attachment.
+                   No extra Python field or DB table is required. -->
+              <page string="Evidencias Digitales" name="page_evidence">
+                <!-- BOTÓN DE ACCIÓN: Abre el wizard para cargar documentos -->
+                <button name="action_open_attachment_wizard" type="object" string="Adjuntar Archivos" class="btn-primary mb-3" icon="fa-upload"/>
+                <!-- LISTADO DE EVIDENCIAS: Vista Kanban integrada de archivos adjuntos -->
+                <field name="attachment_ids" mode="kanban" nolabel="1" class="hide_add_button" options="{'no_create': True, 'no_edit': True, 'no_open': True}">
+                    <kanban create="0" edit="0" delete="0" link="0">
+                        <field name="id"/>
+                        <field name="mimetype"/>
+                        <field name="type"/>
+                        <field name="name"/>
+                        <field name="url"/>
+                        <templates>
+                            <t t-name="card" class="o_kanban_attachment flex-row p-0 overflow-hidden">
+                                <div class="o_dropdown_kanban dropdown">
+                                    <a class="dropdown-toggle o-no-caret btn" role="button" data-bs-toggle="dropdown" href="#" aria-label="Dropdown menu" title="Dropdown menu">
+                                        <span class="fa fa-ellipsis-v"/>
+                                    </a>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a type="object" name="action_preview_modal" class="dropdown-item">Vista Previa</a>
+                                        <a type="object" name="action_delete_attachment_confirm" class="dropdown-item text-danger">Eliminar</a>
+                                    </div>
+                                </div>
+                                <aside class="o_kanban_image bg-light d-flex align-items-center justify-content-center" style="width: 120px; min-width: 120px; height: 100px;">
+                                    <t t-set="webimage" t-value="new RegExp('image.*(gif|jpeg|jpg|png|webp)').test(record.mimetype.value)"/>
+                                    <div t-if="record.type.raw_value == 'url'" class="fa fa-link fa-3x text-muted"/>
+                                    <img t-elif="webimage" t-attf-src="/web/image/#{record.id.raw_value}" style="width: 100%; height: 100%; object-fit: cover;" alt="Document"/>
+                                    <div t-else="" class="o_image o_image_thumbnail" t-att-data-mimetype="record.mimetype.value"/>
+                                </aside>
+                                <main class="p-2 d-flex flex-column justify-content-center flex-grow-1 overflow-hidden">
+                                    <field name="name" class="text-truncate fw-bold mb-1" style="font-size: 1.1rem;"/>
+                                    <div class="text-muted small">
+                                        <t t-if="record.type.raw_value == 'url'">
+                                            <i class="fa fa-globe me-1"/> <field name="url" widget="url"/>
+                                        </t>
+                                        <t t-else="">
+                                            <field name="mimetype"/>
+                                        </t>
+                                    </div>
+                                </main>
+                            </t>
+                        </templates>
+                    </kanban>
+                </field>
+              </page>
+            </notebook>
+            
+          </sheet>
+        </form>
+      </field>
+    </record>
+  </data>
+</odoo>

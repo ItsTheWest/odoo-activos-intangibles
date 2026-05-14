@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- ========================================================= -->
+        <!-- VISTA DE CALENDARIO (CALENDAR VIEW)                       -->
+        <!-- ========================================================= -->
+        <record id="view_activo_intangible_calendar" model="ir.ui.view">
+            <field name="name">activo.intangible.calendar</field>
+            <field name="model">activo.intangible</field>
+            <field name="arch" type="xml">
+                <calendar string="Calendario de Vencimientos" date_start="renewal_date" color="calendar_color" mode="month" delete="0" create="0" edit="0">
+                    <field name="name" string="Activo"/>
+                    <field name="renewal_date" string="Fecha de Vencimiento"/>
+                    <field name="asset_type_id" string="Tipo de Activo"/>
+                    <field name="responsible_id" widget="many2one_avatar_user"/>
+                    <field name="state" invisible="1"/>
+                </calendar>
+            </field>
+        </record>
+
+
+        <!-- Acción de ventana específica para el calendario -->
+        <record id="action_activo_intangible_calendar" model="ir.actions.act_window">
+            <field name="name">Calendario de Vencimientos</field>
+            <field name="res_model">activo.intangible</field>
+            <field name="view_mode">calendar,list,form</field>
+            <field name="view_id" ref="view_activo_intangible_calendar"/>
+        </record>
+
+    </data>
+</odoo>
