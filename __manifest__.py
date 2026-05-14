@@ -40,9 +40,11 @@ Long description of module's purpose
         'web.assets_backend': [
             'gestion_activos_intangibles/static/src/css/calendar_custom.css',
             'gestion_activos_intangibles/static/src/css/dashboard_custom.css',
-            # OWL template must be registered BEFORE the JS module that references it.
+            # OWL templates must be registered BEFORE the JS modules that reference them.
             'gestion_activos_intangibles/static/src/xml/estado_bar_chart.xml',
+            'gestion_activos_intangibles/static/src/xml/tipo_activo_pie_chart.xml',
             'gestion_activos_intangibles/static/src/js/estado_bar_chart.js',
+            'gestion_activos_intangibles/static/src/js/tipo_activo_pie_chart.js',
         ],
     },
 }
