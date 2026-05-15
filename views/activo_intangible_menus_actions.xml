@@ -78,11 +78,11 @@
               action="action_activo_intangible"
               sequence="10"/>
 
-    <!-- 2. Estadísticas: KPI panel (action defined in dashboard_views.xml) -->
+    <!-- 2. Estadísticas: KPI panel (server action defined in dashboard_views.xml) -->
     <menuitem id="menu_activo_dashboard"
               name="Estadísticas"
               parent="menu_activo_intangible_root"
-              action="gestion_activos_intangibles.action_activo_intangible_dashboard"
+              action="gestion_activos_intangibles.action_server_activo_intangible_dashboard"
               sequence="20"/>
 
     <!-- 3. Calendario: calendar view for expiry dates

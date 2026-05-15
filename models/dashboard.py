@@ -62,6 +62,11 @@ class ActivoIntangibleDashboard(models.TransientModel):
         default=lambda self: self.env.company.currency_id,
         readonly=True,
     )
+    name = fields.Char(
+        string="Nombre",
+        default="Estadísticas de Activos",
+        readonly=True
+    )
 
     # -----------------------------------------------------------------------
     # PYTHON SVG GRAPHS (Remaining server-side charts)
@@ -310,5 +315,24 @@ class ActivoIntangibleDashboard(models.TransientModel):
             'view_mode': 'list,calendar,form',
             'context': {'search_default_filter_inactivo': 1},
             'target': 'current',
+        }
+
+    @api.model
+    def action_open_dashboard(self):
+        """
+        Server action logic:
+        1. Creates a new transient record.
+        2. Returns a window action to open that specific record in 'view' mode.
+        This prevents the 'New' breadcrumb and save/discard buttons.
+        """
+        record = self.create({})
+        return {
+            'name': 'Estadísticas de Activos',
+            'type': 'ir.actions.act_window',
+            'res_model': 'activo.intangible.dashboard',
+            'res_id': record.id,
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {'edit': False, 'create': False},
         }
 
