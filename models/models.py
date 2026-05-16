@@ -32,7 +32,8 @@ class ActivoIntangible(models.Model):
     ], string='Estado', default='activo', required=True, tracking=True)
     
     responsible_id = fields.Many2one('hr.employee', string="Responsable")
-    expense_id = fields.Many2one('hr.expense', string="Gastos")
+    expense_id = fields.Many2one('hr.expense', string="Gastos de Mantenimiento")
+    invoice_id = fields.Many2one('account.move', string="Factura de Origen")
     
     valor_contable = fields.Monetary(
         string="Valor Contable",
