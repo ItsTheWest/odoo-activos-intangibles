@@ -184,14 +184,32 @@
                 </div>
               </div>
 
-              <!-- CHART 3: Línea de Tiempo / Información Adicional -->
+              <!-- CHART 3: Historical Valuation Trend -->
               <div class="row mb-4">
                 <div class="col-12">
                   <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-2">
                       <span class="fw-semibold">
-                        <i class="fa fa-info-circle me-2 text-info"/>
-                        Estado General del Repositorio
+                        <i class="fa fa-line-chart me-2 text-primary"/>
+                        Tendencia de Valoración Histórica ($)
+                      </span>
+                      <small class="text-muted">Crecimiento acumulado del portafolio</small>
+                    </div>
+                    <div class="card-body p-0">
+                      <field name="graph_valoracion_linea_svg" widget="html" nolabel="1"/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CHART 4: Línea de Tiempo de Vencimientos -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom d-flex align-items-center justify-content-between py-2">
+                      <span class="fw-semibold">
+                        <i class="fa fa-calendar-check-o me-2 text-info"/>
+                        Próximos Vencimientos (6 meses)
                       </span>
                       <button name="action_ver_pivot" type="object"
                               class="btn btn-sm btn-outline-info">

@@ -75,6 +75,7 @@ class ActivoIntangibleDashboard(models.TransientModel):
     # -----------------------------------------------------------------------
     graph_tipo_svg = fields.Html(string="Gráfico de Tipos", compute="_compute_graphs")
     graph_vencimientos_svg = fields.Html(string="Línea de Tiempo", compute="_compute_graphs")
+    graph_valoracion_linea_svg = fields.Html(string="Crecimiento de Valoración", compute="_compute_graphs")
 
     @api.depends('total_activos')  # Dummy dependency to trigger computation
     def _compute_graphs(self):
@@ -89,6 +90,7 @@ class ActivoIntangibleDashboard(models.TransientModel):
             # graph_estado_svg removed — now rendered by the OWL EstadoBarChart widget.
             record.graph_tipo_svg = self._generate_pie_chart(activos)
             record.graph_vencimientos_svg = self._generate_timeline_chart(activos)
+            record.graph_valoracion_linea_svg = self._generate_valuation_line_chart(activos)
 
     # -----------------------------------------------------------------------
     # DATA COMPUTATION HELPERS
@@ -316,6 +318,65 @@ class ActivoIntangibleDashboard(models.TransientModel):
             'context': {'search_default_filter_inactivo': 1},
             'target': 'current',
         }
+
+    def _generate_valuation_line_chart(self, activos):
+        """
+        HISTORICAL VALUATION LINE CHART
+        Shows the cumulative growth of the portfolio valuation over the last 12 months.
+        """
+        from datetime import datetime, timedelta
+        from collections import defaultdict
+        
+        today = datetime.now()
+        # Get start of month for the last 12 months
+        months_list = []
+        for i in range(11, -1, -1):
+            d = today - timedelta(days=i*30)
+            months_list.append(d.replace(day=1))
+        
+        # Calculate valuation for each point
+        data_points = []
+        for m_start in months_list:
+            # Sum valor_contable for assets created before or during this month
+            # Using create_date as a proxy for acquisition
+            val_sum = sum(a.valor_contable for a in activos if a.create_date and a.create_date <= m_start)
+            data_points.append(val_sum)
+            
+        max_val = max(data_points + [1000])
+        labels = [m.strftime('%b') for m in months_list]
+        
+        svg = '<div class="p-3"><svg viewBox="0 0 800 180" style="width:100%; height:150px;">'
+        
+        # Grid lines
+        for i in range(5):
+            y = 30 + i * 30
+            svg += f'<line x1="50" y1="{y}" x2="750" y2="{y}" stroke="#f0f0f0" stroke-width="1"/>'
+        
+        x_step = 700 / 11
+        points = []
+        for i, val in enumerate(data_points):
+            x = 50 + i * x_step
+            h = (val / max_val) * 120
+            y = 150 - h
+            points.append(f"{x},{y}")
+            
+            # Label
+            if i % 2 == 0:
+                svg += f'<text x="{x}" y="170" text-anchor="middle" font-size="10" fill="#999">{labels[i]}</text>'
+            
+            # Dot
+            svg += f'<circle cx="{x}" cy="{y}" r="4" fill="#2d9b5e"/>'
+        
+        # Path
+        if len(points) > 1:
+            path_data = "L".join(points)
+            svg += f'<path d="M{path_data}" fill="none" stroke="#2d9b5e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+            # Gradient area
+            area_path = f"M{points[0]} L" + path_data + f" L{points[-1][0:3]},150 L50,150 Z"
+            svg += f'<path d="{area_path}" fill="#2d9b5e" opacity="0.1"/>'
+            
+        svg += '</svg></div>'
+        return svg
 
     @api.model
     def action_open_dashboard(self):
