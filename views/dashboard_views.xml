@@ -195,8 +195,9 @@
                       </span>
                       <small class="text-muted">Crecimiento acumulado del portafolio</small>
                     </div>
-                    <div class="card-body p-0">
-                      <field name="graph_valoracion_linea_svg" widget="html" nolabel="1"/>
+                    <div class="card-body p-3" style="height: 320px;">
+                      <!-- OWL Chart.js widget — replaces legacy SVG -->
+                      <widget name="tendencia_line_chart"/>
                     </div>
                   </div>
                 </div>

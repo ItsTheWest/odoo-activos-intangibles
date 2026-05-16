@@ -91,6 +91,35 @@ class ActivoIntangible(models.Model):
         for rec in self:
             rec.document_count = len(rec.attachment_ids)
 
+    @api.model
+    def get_historical_valuation_data(self):
+        """
+        Returns the cumulative growth of the portfolio valuation over the last 12 months.
+        Used by the OWL Line Chart widget.
+        """
+        from datetime import datetime, timedelta
+        
+        today = datetime.now()
+        months_list = []
+        for i in range(11, -1, -1):
+            d = today - timedelta(days=i*30)
+            months_list.append(d.replace(day=1))
+            
+        activos = self.search([('state', '!=', 'inactivo')])
+        
+        labels = [m.strftime('%b %Y') for m in months_list]
+        data = []
+        
+        for m_start in months_list:
+            # Sum valor_contable for assets created before or during this month
+            val_sum = sum(a.valor_contable for a in activos if a.create_date and a.create_date <= m_start)
+            data.append(val_sum)
+            
+        return {
+            'labels': labels,
+            'data': data,
+        }
+
     # -------------------------------------------------------------------------
     # 1.3 ORM OVERRIDES (Create & Write)
     # -------------------------------------------------------------------------

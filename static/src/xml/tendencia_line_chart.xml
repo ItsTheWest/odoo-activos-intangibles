@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="gestion_activos_intangibles.TendenciaLineChart">
+        <div class="o_tendencia_line_chart w-100" style="position: relative; height: 300px;">
+            <canvas t-ref="lineCanvas"/>
+        </div>
+    </t>
+
+</templates>

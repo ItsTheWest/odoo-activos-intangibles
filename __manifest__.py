@@ -60,8 +60,10 @@ Long description of module's purpose
             # OWL templates must be registered BEFORE the JS modules that reference them.
             'gestion_activos_intangibles/static/src/xml/estado_bar_chart.xml',
             'gestion_activos_intangibles/static/src/xml/tipo_activo_pie_chart.xml',
+            'gestion_activos_intangibles/static/src/xml/tendencia_line_chart.xml',
             'gestion_activos_intangibles/static/src/js/estado_bar_chart.js',
             'gestion_activos_intangibles/static/src/js/tipo_activo_pie_chart.js',
+            'gestion_activos_intangibles/static/src/js/tendencia_line_chart.js',
         ],
     },
 }
