@@ -73,24 +73,26 @@ def main():
         
         created_count = 0
         for i in range(total_to_generate):
-            type_id = random.choice(type_ids)
-            type_info = models.execute_kw(DB, uid, PASSWORD, 'activo.intangible.type', 'read', [[type_id]], {'fields': ['name', 'lifespan_days']})[0]
-            
-            name = f"{type_info['name']} - {random.choice(COMPANIES)} {random.choice(PRODUCTS)} {random.randint(2020, 2026)}"
-            concession_date = (datetime.now() - timedelta(days=random.randint(10, 450))).strftime('%Y-%m-%d')
-            
-            rand_state = random.randint(1, 100)
-            if rand_state <= 10:
-                renewal_date = (datetime.now() - timedelta(days=random.randint(1, 30))).strftime('%Y-%m-%d')
-            elif rand_state <= 25:
-                renewal_date = (datetime.now() + timedelta(days=random.randint(1, 55))).strftime('%Y-%m-%d')
-            else:
-                renewal_date = (datetime.now() + timedelta(days=random.randint(70, type_info['lifespan_days'] or 365))).strftime('%Y-%m-%d')
-                
-            valor_contable = round(random.uniform(500.0, 25000.0), 2)
-            
             try:
-                # STEP A: Create Vendor Bill (Facturación) -> Origin of Value
+                type_id = random.choice(type_ids)
+                type_info = models.execute_kw(DB, uid, PASSWORD, 'activo.intangible.type', 'read', [[type_id]], {'fields': ['name', 'lifespan_days']})[0]
+                
+                name = f"{type_info['name']} - {random.choice(COMPANIES)} {random.choice(PRODUCTS)} {random.randint(2020, 2026)}"
+                concession_date = (datetime.now() - timedelta(days=random.randint(10, 450))).strftime('%Y-%m-%d')
+                
+                rand_state = random.randint(1, 100)
+                if rand_state <= 10:
+                    renewal_date = (datetime.now() - timedelta(days=random.randint(1, 30))).strftime('%Y-%m-%d')
+                elif rand_state <= 25:
+                    renewal_date = (datetime.now() + timedelta(days=random.randint(1, 55))).strftime('%Y-%m-%d')
+                else:
+                    renewal_date = (datetime.now() + timedelta(days=random.randint(70, type_info['lifespan_days'] or 365))).strftime('%Y-%m-%d')
+                    
+                valor_contable = round(random.uniform(500.0, 25000.0), 2)
+                
+                print(f"[{i+1}/{total_to_generate}] Processing: {name}...")
+
+                # STEP A: Create Vendor Bill (Facturación)
                 invoice_vals = {
                     'move_type': 'in_invoice',
                     'partner_id': partner_id,
@@ -104,16 +106,18 @@ def main():
                     ]
                 }
                 invoice_id = models.execute_kw(DB, uid, PASSWORD, 'account.move', 'create', [invoice_vals])
+                print(f"   -> Facturación creada (ID: {invoice_id})")
                 
-                # STEP B: Create Expense (Gastos) -> Maintenance
+                # STEP B: Create Expense (Gastos)
                 expense_vals = {
                     'name': f"Mantenimiento anual de {name}",
                     'employee_id': employee_id,
                     'product_id': product_id,
-                    'unit_amount': round(valor_contable * 0.1, 2), # Maintenance is 10% of value
+                    'total_amount': round(valor_contable * 0.1, 2),
                     'date': concession_date,
                 }
                 expense_id = models.execute_kw(DB, uid, PASSWORD, 'hr.expense', 'create', [expense_vals])
+                print(f"   -> Gasto creado (ID: {expense_id})")
                 
                 # STEP C: Create Intangible Asset and link them!
                 asset_vals = {
@@ -123,19 +127,20 @@ def main():
                     'concession_date': concession_date,
                     'renewal_date': renewal_date,
                     'valor_contable': valor_contable,
-                    'invoice_id': invoice_id,  # Linked to Invoicing
-                    'expense_id': expense_id,  # Linked to Expenses
+                    'invoice_id': invoice_id,
+                    'expense_id': expense_id,
                 }
-                models.execute_kw(DB, uid, PASSWORD, 'activo.intangible', 'create', [asset_vals])
+                asset_id = models.execute_kw(DB, uid, PASSWORD, 'activo.intangible', 'create', [asset_vals])
+                print(f"   -> Activo Intangible finalizado (ID: {asset_id})")
                 
                 created_count += 1
-                if created_count % 10 == 0:
-                    print(f"Created {created_count}/{total_to_generate} full asset lifecycles...")
                     
             except Exception as e:
-                print(f"Error creating ecosystem for {name}: {e}")
+                print(f"   [!] Error creating ecosystem for {name}: {e}")
                 
-        print(f"\nSuccessfully generated {created_count} assets with integrated Facturación & Gastos!")
+        print("-" * 50)
+        print(f"PROCESS FINISHED: {created_count} assets created successfully.")
+        print("-" * 50)
 
     except Exception as e:
         print(f"Connection error: {e}")
