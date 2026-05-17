@@ -203,7 +203,7 @@
                 </div>
               </div>
 
-              <!-- CHART 4: Línea de Tiempo de Vencimientos -->
+              <!-- CHART 4: Próximos Vencimientos (6 meses) -->
               <div class="row mb-4">
                 <div class="col-12">
                   <div class="card border-0 shadow-sm">
@@ -217,8 +217,9 @@
                         <i class="fa fa-table me-1"/> Explorar Datos
                       </button>
                     </div>
-                    <div class="card-body p-0">
-                      <field name="graph_vencimientos_svg" widget="html" nolabel="1"/>
+                    <div class="card-body p-3" style="height: 300px;">
+                      <!-- OWL Chart.js widget — replaces legacy SVG -->
+                      <widget name="vencimientos_bar_chart"/>
                     </div>
                   </div>
                 </div>

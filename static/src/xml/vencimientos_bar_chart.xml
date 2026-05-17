@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!--
+        Template for the VencimientosBarChart OWL widget.
+        Renders a bar chart of asset expirations grouped by month (next 6 months).
+        The <canvas> is bound via t-ref="vencimientosCanvas".
+    -->
+    <t t-name="gestion_activos_intangibles.VencimientosBarChart">
+        <div class="o_vencimientos_bar_chart w-100" style="position: relative; height: 260px;">
+            <canvas t-ref="vencimientosCanvas"/>
+        </div>
+    </t>
+
+</templates>
