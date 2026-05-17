@@ -97,22 +97,40 @@ class ActivoIntangible(models.Model):
         Returns the cumulative growth of the portfolio valuation over the last 12 months.
         Used by the OWL Line Chart widget.
         """
-        from datetime import datetime, timedelta
+        from dateutil.relativedelta import relativedelta
         
-        today = datetime.now()
+        # Get current date
+        today = fields.Date.today()
+        
+        # Generate a list of the last 12 months (including the current one)
+        # Each entry is the first day of that month for easy comparison
         months_list = []
         for i in range(11, -1, -1):
-            d = today - timedelta(days=i*30)
-            months_list.append(d.replace(day=1))
+            first_day = today - relativedelta(months=i, day=1)
+            months_list.append(first_day)
             
+        # Search for all assets that are not inactive
         activos = self.search([('state', '!=', 'inactivo')])
         
+        # Prepare labels (Jan 2024, Feb 2024, etc.)
         labels = [m.strftime('%b %Y') for m in months_list]
         data = []
         
-        for m_start in months_list:
-            # Sum valor_contable for assets created before or during this month
-            val_sum = sum(a.valor_contable for a in activos if a.create_date and a.create_date <= m_start)
+        for m_first_day in months_list:
+            # For each month, sum the value of assets that existed at the END of that month.
+            # This is equivalent to assets with a date before the first day of the NEXT month.
+            next_month_start = m_first_day + relativedelta(months=1)
+            
+            val_sum = 0.0
+            for a in activos:
+                # Prioritize concession_date (actual acquisition/concession date).
+                # If not available, fallback to create_date (system registration date).
+                # Convert create_date (datetime) to date for comparison.
+                asset_date = a.concession_date or (a.create_date and a.create_date.date())
+                
+                if asset_date and asset_date < next_month_start:
+                    val_sum += a.valor_contable or 0.0
+            
             data.append(val_sum)
             
         return {
