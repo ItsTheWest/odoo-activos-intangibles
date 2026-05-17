@@ -30,6 +30,7 @@ class EstadoBarChart extends Component {
 
     setup() {
         this.orm       = useService("orm");
+        this.action    = useService("action");
         this.canvasRef = useRef("barCanvas");
         this._chart    = null;
         this._data     = [];
@@ -83,6 +84,7 @@ class EstadoBarChart extends Component {
             // '__count' holds the number of records in this group.
             const stateKey = g.state || "";
             return {
+                key:   stateKey,
                 label: STATE_META[stateKey]?.label || stateKey,
                 count: g.__count || 0,
                 color: STATE_META[stateKey]?.color || "#95a5a6",
@@ -117,6 +119,19 @@ class EstadoBarChart extends Component {
             options: {
                 responsive:          true,
                 maintainAspectRatio: false,
+                onHover: (event, chartElement) => {
+                    // Update canvas cursor to show the bars are interactive and clickable.
+                    const target = event.chart?.canvas || event.native?.target;
+                    if (target) {
+                        target.style.cursor = chartElement.length ? "pointer" : "default";
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements && elements.length > 0) {
+                        const index = elements[0].index;
+                        this._onBarClick(index);
+                    }
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -138,6 +153,26 @@ class EstadoBarChart extends Component {
                     },
                 },
             },
+        });
+    }
+
+    /**
+     * Interactivity Handler: When a bar representing a specific state is clicked,
+     * redirect to the intangible asset list view pre-filtered by that state.
+     *
+     * @param {Number} index - The index of the clicked bar
+     */
+    _onBarClick(index) {
+        const item = this._data[index];
+        if (!item) return;
+
+        this.action.doAction({
+            name: `Activos: ${item.label}`,
+            type: "ir.actions.act_window",
+            res_model: "activo.intangible",
+            views: [[false, "list"], [false, "form"]],
+            domain: [["state", "=", item.key]],
+            target: "current",
         });
     }
 }

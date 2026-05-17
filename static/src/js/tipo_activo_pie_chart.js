@@ -24,6 +24,7 @@ class TipoActivoPieChart extends Component {
 
     setup() {
         this.orm       = useService("orm");
+        this.action    = useService("action");
         this.canvasRef = useRef("pieCanvas");
         this._chart    = null;
         this._data     = [];
@@ -64,11 +65,13 @@ class TipoActivoPieChart extends Component {
 
         this._data = (groups || []).map((g, index) => {
             // asset_type_id usually comes as [id, "Name"] or false
+            const typeId = Array.isArray(g.asset_type_id) ? g.asset_type_id[0] : g.asset_type_id;
             const typeLabel = Array.isArray(g.asset_type_id) 
                 ? g.asset_type_id[1] 
                 : (g.asset_type_id || "Sin Tipo");
                 
             return {
+                id:    typeId,
                 label: typeLabel,
                 count: g.__count || 0,
                 color: COLORS[index % COLORS.length],
@@ -103,6 +106,19 @@ class TipoActivoPieChart extends Component {
                 responsive:          true,
                 maintainAspectRatio: false,
                 cutout:              "70%", // Makes it a sleek doughnut
+                onHover: (event, chartElement) => {
+                    // Update canvas cursor to show the segments are interactive and clickable.
+                    const target = event.chart?.canvas || event.native?.target;
+                    if (target) {
+                        target.style.cursor = chartElement.length ? "pointer" : "default";
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements && elements.length > 0) {
+                        const index = elements[0].index;
+                        this._onPieClick(index);
+                    }
+                },
                 plugins: {
                     legend: {
                         position: "right",
@@ -123,6 +139,26 @@ class TipoActivoPieChart extends Component {
                     },
                 },
             },
+        });
+    }
+
+    /**
+     * Interactivity Handler: When a pie segment representing a specific asset type
+     * is clicked, redirect to the intangible asset list view pre-filtered by that type.
+     *
+     * @param {Number} index - The index of the clicked segment
+     */
+    _onPieClick(index) {
+        const item = this._data[index];
+        if (!item) return;
+
+        this.action.doAction({
+            name: `Activos: ${item.label}`,
+            type: "ir.actions.act_window",
+            res_model: "activo.intangible",
+            views: [[false, "list"], [false, "form"]],
+            domain: [["asset_type_id", "=", item.id]],
+            target: "current",
         });
     }
 }
