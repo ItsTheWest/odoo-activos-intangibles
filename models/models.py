@@ -31,6 +31,13 @@ class ActivoIntangible(models.Model):
         ('expirado', 'Expirado'),
     ], string='Estado', default='activo', required=True, tracking=True)
     
+    nivel_riesgo = fields.Selection([
+        ('bajo', 'Bajo Riesgo'),
+        ('medio', 'Riesgo Medio'),
+        ('alto', 'Alto Riesgo'),
+    ], string='Nivel de Riesgo', compute='_compute_nivel_riesgo', store=True, tracking=True)
+
+    
     responsible_id = fields.Many2one('hr.employee', string="Responsable")
     expense_id = fields.Many2one('hr.expense', string="Gastos de Mantenimiento")
     invoice_id = fields.Many2one('account.move', string="Factura de Origen")
@@ -84,6 +91,20 @@ class ActivoIntangible(models.Model):
                 record.calendar_color = 2   # Naranja
             else:
                 record.calendar_color = 0   # Por defecto
+
+    @api.depends('state', 'valor_contable')
+    def _compute_nivel_riesgo(self):
+        """Calcula automáticamente el nivel de riesgo del activo."""
+        for rec in self:
+            if rec.state == 'expirado':
+                rec.nivel_riesgo = 'alto'
+            elif rec.state == 'por_expirar':
+                if rec.valor_contable and rec.valor_contable > 1000:
+                    rec.nivel_riesgo = 'alto'
+                else:
+                    rec.nivel_riesgo = 'medio'
+            else:
+                rec.nivel_riesgo = 'bajo'
 
     @api.depends('attachment_ids')
     def _compute_document_count(self):

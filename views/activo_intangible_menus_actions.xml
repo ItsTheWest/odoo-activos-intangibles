@@ -93,6 +93,13 @@
               action="gestion_activos_intangibles.action_activo_intangible_calendar"
               sequence="30"/>
 
+    <!-- 4. Matriz de Riesgos: kanban view grouped by computed risk level -->
+    <menuitem id="menu_activo_intangible_risk"
+              name="Matriz de Riesgos"
+              parent="menu_activo_intangible_root"
+              action="gestion_activos_intangibles.action_activo_intangible_risk"
+              sequence="40"/>
+
     <!-- 5. Configuración: parent node — children defined below -->
     <menuitem id="menu_activo_intangible_config"
               name="Configuración"

@@ -43,6 +43,7 @@ Long description of module's purpose
         # ── LAYER 5: Analysis & reporting views ──────────────────────────
         'views/dashboard_views.xml',
         'views/calendar_views.xml',
+        'views/activo_intangible_risk_kanban_view.xml',
 
         # ── LAYER 6: Navigation (menus + actions) ────────────────────────
         # MUST be last: every action and view xml_id referenced here must
