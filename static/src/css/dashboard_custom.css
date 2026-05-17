@@ -1,18 +1,23 @@
+/* ─── KPI Card button wrapper ─────────────────────────────────────────────── */
 .o_dashboard_card_btn {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    border-radius: 10px; /* mirrors the card's border-radius */
 }
 
+/* Lift + deepen shadow so rounded corners become clearly visible */
 .o_dashboard_card_btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14) !important;
 }
 
 .o_dashboard_card_btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    transform: translateY(-1px) scale(1.005);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10) !important;
 }
 
-/* Ensure the button doesn't affect the inner card's layout */
+/* Keep inner card stretched to the full button width */
 .o_dashboard_card_btn .card {
     width: 100%;
+    /* Ensure the colored border-radius is never clipped by a parent overflow */
+    overflow: visible;
 }
