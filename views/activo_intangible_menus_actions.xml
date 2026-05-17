@@ -20,6 +20,11 @@
           <filter string="Expirados"   name="filter_expirado"    domain="[('state', '=', 'expirado')]"/>
           <filter string="Inactivos"   name="filter_inactivo"    domain="[('state', '=', 'inactivo')]"/>
 
+          <separator/>
+          <filter string="Bajo Riesgo" name="filter_riesgo_bajo" domain="[('nivel_riesgo', '=', 'bajo')]"/>
+          <filter string="Riesgo Medio" name="filter_riesgo_medio" domain="[('nivel_riesgo', '=', 'medio')]"/>
+          <filter string="Alto Riesgo" name="filter_riesgo_alto" domain="[('nivel_riesgo', '=', 'alto')]"/>
+          <separator/>
           <group>
             <filter string="Tipo de Activo" name="group_by_asset_type" context="{'group_by':'asset_type_id'}"/>
             <filter string="Estado"         name="group_by_state"      context="{'group_by':'state'}"/>
