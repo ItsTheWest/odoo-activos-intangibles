@@ -8,7 +8,7 @@
             <field name="name">activo.intangible.risk.kanban</field>
             <field name="model">activo.intangible</field>
             <field name="arch" type="xml">
-                <kanban default_group_by="nivel_riesgo" class="o_kanban_small_column" records_draggable="false" quick_create="false">
+                <kanban default_group_by="nivel_riesgo" class="o_kanban_small_column" records_draggable="true" quick_create="false">
                     <field name="name"/>
                     <field name="asset_type_id"/>
                     <field name="nivel_riesgo"/>
@@ -19,40 +19,35 @@
                     <field name="responsible_id"/>
                     <templates>
                         <t t-name="card">
-                            <div t-attf-class="oe_kanban_global_click oe_kanban_card">
-                                <div class="o_kanban_record_top">
-                                    <div class="o_kanban_record_headings">
-                                        <strong class="o_kanban_record_title">
+                            <div t-attf-class="oe_kanban_global_click oe_kanban_card mb-3 p-3 shadow-sm border-0 rounded">
+                                <div class="d-flex justify-content-between align-items-start w-100">
+                                    <!-- Left side: Title, Type (Subtitle), and Status Badge -->
+                                    <div class="o_kanban_record_headings flex-grow-1">
+                                        <strong class="o_kanban_record_title d-block text-primary mb-1" style="font-size: 1.1em; line-height: 1.3;">
                                             <field name="name"/>
                                         </strong>
-                                        <br/>
-                                        <small class="o_kanban_record_subtitle text-muted">
-                                            <field name="asset_type_id"/>
-                                        </small>
-                                    </div>
-                                    <div class="o_dropdown_kanban dropdown">
-                                        <a role="button" class="dropdown-toggle o-no-caret btn" data-toggle="dropdown" data-display="static" href="#" aria-label="Dropdown menu" title="Dropdown menu">
-                                            <span class="fa fa-ellipsis-v"/>
-                                        </a>
-                                        <div class="dropdown-menu" role="menu">
-                                            <a role="menuitem" type="edit" class="dropdown-item">Editar</a>
+                                        <div class="text-muted mb-2" style="font-size: 0.9em;">
+                                            <span class="fa fa-tag me-1"/> <field name="asset_type_id"/>
+                                        </div>
+                                        <div class="mb-1">
+                                            <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-warning="state == 'por_expirar'" decoration-info="state == 'inactivo'" decoration-danger="state == 'expirado'"/>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="o_kanban_record_body mt-2">
-                                    <div t-if="record.renewal_date.raw_value">
-                                        <strong>Vencimiento: </strong> <field name="renewal_date"/>
-                                    </div>
-                                    <div t-if="record.valor_contable.raw_value">
-                                        <strong>Valor Contable: </strong> <field name="valor_contable" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                    </div>
-                                </div>
-                                <div class="o_kanban_record_bottom mt-2">
-                                    <div class="oe_kanban_bottom_left">
-                                        <field name="state" widget="badge" decoration-success="state == 'activo'" decoration-warning="state == 'por_expirar'" decoration-info="state == 'inactivo'" decoration-danger="state == 'expirado'"/>
-                                    </div>
-                                    <div class="oe_kanban_bottom_right">
+                                    <!-- Right side: Assign Responsible Avatar -->
+                                    <div class="o_kanban_record_avatar ms-2 flex-shrink-0">
                                         <field name="responsible_id" widget="many2one_avatar"/>
+                                    </div>
+                                </div>
+
+                                <!-- Body / Bottom: Valuation and Expiration Date separated by a subtle border -->
+                                <div class="o_kanban_record_body border-top pt-2 mt-2" style="font-size: 0.85em;">
+                                    <div class="d-flex justify-content-between align-items-center w-100">
+                                        <div t-if="record.renewal_date.raw_value" class="text-muted">
+                                            <span class="fa fa-calendar me-1"/> <strong>Vence:</strong> <field name="renewal_date"/>
+                                        </div>
+                                        <div t-if="record.valor_contable.raw_value" class="text-dark fw-bold">
+                                            <field name="valor_contable" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

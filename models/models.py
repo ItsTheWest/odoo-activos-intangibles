@@ -35,7 +35,7 @@ class ActivoIntangible(models.Model):
         ('bajo', 'Bajo Riesgo'),
         ('medio', 'Riesgo Medio'),
         ('alto', 'Alto Riesgo'),
-    ], string='Nivel de Riesgo', compute='_compute_nivel_riesgo', store=True, tracking=True)
+    ], string='Nivel de Riesgo', compute='_compute_nivel_riesgo', inverse='_inverse_nivel_riesgo', store=True, tracking=True)
 
     
     responsible_id = fields.Many2one('hr.employee', string="Responsable")
@@ -105,6 +105,19 @@ class ActivoIntangible(models.Model):
                     rec.nivel_riesgo = 'medio'
             else:
                 rec.nivel_riesgo = 'bajo'
+
+    def _inverse_nivel_riesgo(self):
+        """Sincroniza el estado del activo cuando se arrastra la tarjeta en el Kanban de riesgos."""
+        for rec in self:
+            if rec.nivel_riesgo == 'alto':
+                if rec.state not in ['expirado', 'por_expirar']:
+                    rec.state = 'expirado'
+            elif rec.nivel_riesgo == 'medio':
+                if rec.state != 'por_expirar':
+                    rec.state = 'por_expirar'
+            elif rec.nivel_riesgo == 'bajo':
+                if rec.state not in ['activo', 'inactivo']:
+                    rec.state = 'activo'
 
     @api.depends('attachment_ids')
     def _compute_document_count(self):
