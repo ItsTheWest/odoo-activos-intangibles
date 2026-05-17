@@ -23,6 +23,7 @@ class VencimientosBarChart extends Component {
 
     setup() {
         this.orm       = useService("orm");
+        this.action    = useService("action");
         this.canvasRef = useRef("vencimientosCanvas");
         this._chart    = null;
         this._data     = { labels: [], data: [] };
@@ -160,6 +161,19 @@ class VencimientosBarChart extends Component {
             options: {
                 responsive:          true,
                 maintainAspectRatio: false,
+                onHover: (event, chartElement) => {
+                    // Update canvas cursor to show the bars are interactive and clickable.
+                    const target = event.chart?.canvas || event.native?.target;
+                    if (target) {
+                        target.style.cursor = chartElement.length ? "pointer" : "default";
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements && elements.length > 0) {
+                        const index = elements[0].index;
+                        this._onBarClick(index);
+                    }
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
@@ -185,6 +199,41 @@ class VencimientosBarChart extends Component {
                     },
                 },
             },
+        });
+    }
+
+    /**
+     * Interactivity Handler: When a bar representing a specific month is clicked,
+     * it triggers a standard Odoo window action to redirect to the intangible asset
+     * list view, pre-filtered for active assets expiring in that specific month.
+     *
+     * @param {Number} index - The index of the clicked bar (0 to 5)
+     */
+    _onBarClick(index) {
+        const today = new Date();
+        const targetDate = new Date(today.getFullYear(), today.getMonth() + index, 1);
+        
+        const year = targetDate.getFullYear();
+        const month = targetDate.getMonth();
+        
+        // Compute precise date boundaries for the selected month (start / end)
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        
+        const firstDayStr = firstDay.toISOString().split("T")[0];
+        const lastDayStr = lastDay.toISOString().split("T")[0];
+        
+        this.action.doAction({
+            name: `Vencimientos: ${MONTH_NAMES_ES[month]} ${year}`,
+            type: "ir.actions.act_window",
+            res_model: "activo.intangible",
+            views: [[false, "list"], [false, "form"]],
+            domain: [
+                ["renewal_date", ">=", firstDayStr],
+                ["renewal_date", "<=", lastDayStr],
+                ["state", "!=", "inactivo"]
+            ],
+            target: "current",
         });
     }
 }
